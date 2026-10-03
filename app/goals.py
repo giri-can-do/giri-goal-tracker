@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 
 from app import db
-from app.models import Goal
+from app.models import Goal, Activity
 
 
 goals_bp = Blueprint("goals", __name__, url_prefix="/goals")
@@ -106,4 +106,75 @@ def create():
     return render_template(
         "goals/create.html",
         today=date.today()
+    )
+
+@goals_bp.route("/<int:goal_id>/activities/new", methods=["GET", "POST"])
+@login_required
+def create_activity(goal_id):
+    goal = Goal.query.filter_by(
+        id=goal_id,
+        user_id=current_user.id
+    ).first_or_404()
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        measurement_type = request.form.get("measurement_type", "").strip()
+        target_value_raw = request.form.get("target_value", "").strip()
+        unit = request.form.get("unit", "").strip()
+        frequency = request.form.get("frequency", "").strip()
+
+        if not title or not measurement_type or not frequency:
+            flash(
+                "Activity, measurement type and frequency are required.",
+                "danger"
+            )
+            return render_template(
+                "goals/create_activity.html",
+                goal=goal
+            )
+
+        try:
+            target_value = (
+                float(target_value_raw)
+                if target_value_raw
+                else None
+            )
+        except ValueError:
+            flash("Target must be a valid number.", "danger")
+            return render_template(
+                "goals/create_activity.html",
+                goal=goal
+            )
+
+        if measurement_type in ("numeric", "duration"):
+            if target_value is None or target_value <= 0:
+                flash(
+                    "Numeric and duration activities require a target greater than 0.",
+                    "danger"
+                )
+                return render_template(
+                    "goals/create_activity.html",
+                    goal=goal
+                )
+
+        activity = Activity(
+            goal_id=goal.id,
+            title=title,
+            measurement_type=measurement_type,
+            target_value=target_value,
+            unit=unit or None,
+            frequency=frequency,
+            is_active=True
+        )
+
+        db.session.add(activity)
+        db.session.commit()
+
+        flash("Activity created successfully.", "success")
+
+        return redirect(url_for("goals.index"))
+
+    return render_template(
+        "goals/create_activity.html",
+        goal=goal
     )

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Add Activity | Goal Tracker{% endblock %}
+
+{% block content %}
+
+<h1>Add Daily Activity</h1>
+
+<p>
+    Goal: <strong>{{ goal.title }}</strong>
+</p>
+
+<form method="POST">
+
+    <label>Activity</label>
+    <input
+        type="text"
+        name="title"
+        placeholder="Read"
+        required
+    >
+
+    <br><br>
+
+    <label>How do you track it?</label>
+    <select name="measurement_type" required>
+        <option value="">Select</option>
+        <option value="boolean">Complete / Not Complete</option>
+        <option value="numeric">Number</option>
+        <option value="duration">Duration</option>
+    </select>
+
+    <br><br>
+
+    <label>Daily Target</label>
+    <input
+        type="number"
+        name="target_value"
+        min="0"
+        step="any"
+        placeholder="10"
+    >
+
+    <label>Unit</label>
+    <input
+        type="text"
+        name="unit"
+        placeholder="pages"
+    >
+
+    <br><br>
+
+    <label>Frequency</label>
+    <select name="frequency" required>
+        <option value="daily">Every Day</option>
+        <option value="weekly">Weekly</option>
+    </select>
+
+    <br><br>
+
+    <button type="submit">
+        Add Activity
+    </button>
+
+</form>
+
+<p>
+    <a href="{{ url_for('goals.index') }}">
+        Cancel
+    </a>
+</p>
+
+{% endblock %}
