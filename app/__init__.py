@@ -22,5 +22,10 @@ def create_app():
     login_manager.login_view = "auth.login"
 
     from app import models
+    from app.auth import auth_bp
+    from app.today import today_bp
+
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(today_bp)
 
     return app
