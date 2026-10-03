@@ -8,10 +8,87 @@
 
 <h2>Today</h2>
 
-<p>No activities for today.</p>
+<p>{{ today.strftime("%A, %B %d, %Y") }}</p>
 
-<a href="{{ url_for('goals.create') }}">
-    + Create Goal
-</a>
+{% if activities %}
+
+    {% for activity in activities %}
+
+        {% set entry = entries.get(activity.id) %}
+
+        <hr>
+
+        <h3>{{ activity.title }}</h3>
+
+        <p>
+            Goal: {{ activity.goal.title }}
+        </p>
+
+        {% if activity.target_value %}
+            <p>
+                Target:
+                {{ activity.target_value }}
+                {{ activity.unit or "" }}
+            </p>
+        {% endif %}
+
+        {% if entry %}
+            <p>
+                Today:
+                {{ entry.value }}
+                {{ activity.unit or "" }}
+            </p>
+        {% endif %}
+
+        <form
+            method="POST"
+            action="{{ url_for('today.check_in', activity_id=activity.id) }}"
+        >
+
+            {% if activity.measurement_type == "boolean" %}
+
+                <input type="hidden" name="value" value="1">
+
+                <button type="submit">
+                    {% if entry and entry.value >= 1 %}
+                        ✓ Completed
+                    {% else %}
+                        Mark Complete
+                    {% endif %}
+                </button>
+
+            {% else %}
+
+                <input
+                    type="number"
+                    name="value"
+                    min="0"
+                    step="any"
+                    value="{{ entry.value if entry else '' }}"
+                    placeholder="{{ activity.target_value or 0 }}"
+                    required
+                >
+
+                <span>{{ activity.unit or "" }}</span>
+
+                <button type="submit">
+                    Update
+                </button>
+
+            {% endif %}
+
+        </form>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>No activities for today.</p>
+
+    <a href="{{ url_for('goals.create') }}">
+        + Create Goal
+    </a>
+
+{% endif %}
 
 {% endblock %}
