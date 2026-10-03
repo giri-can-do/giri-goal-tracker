@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Goals | Goal Tracker{% endblock %}
+
+{% block content %}
+
+<h1>My Goals</h1>
+
+<p>
+    <a href="{{ url_for('goals.create') }}">+ Create Goal</a>
+</p>
+
+{% if goals %}
+
+    {% for goal in goals %}
+        <hr>
+
+        <h2>{{ goal.title }}</h2>
+
+        {% if goal.category %}
+            <p>Category: {{ goal.category }}</p>
+        {% endif %}
+
+        <p>Type: {{ goal.goal_type }}</p>
+
+        {% if goal.target_value %}
+            <p>
+                Target:
+                {{ goal.target_value }}
+                {{ goal.unit or "" }}
+            </p>
+        {% endif %}
+
+        <p>Status: {{ goal.status }}</p>
+
+        <p>Start: {{ goal.start_date }}</p>
+
+        {% if goal.deadline %}
+            <p>Deadline: {{ goal.deadline }}</p>
+        {% endif %}
+
+    {% endfor %}
+
+{% else %}
+
+    <p>You haven't created any goals yet.</p>
+
+{% endif %}
+
+{% endblock %}

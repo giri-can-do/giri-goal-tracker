@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Create Goal | Goal Tracker{% endblock %}
+
+{% block content %}
+
+<h1>Create Goal</h1>
+
+<form method="POST">
+
+    <label>Goal</label>
+    <input
+        type="text"
+        name="title"
+        placeholder="Read 8 books"
+        required
+    >
+
+    <br><br>
+
+    <label>Description</label>
+    <textarea
+        name="description"
+        placeholder="Why is this goal important?"
+    ></textarea>
+
+    <br><br>
+
+    <label>Category</label>
+    <input
+        type="text"
+        name="category"
+        placeholder="Reading"
+    >
+
+    <br><br>
+
+    <label>Goal Type</label>
+    <select name="goal_type" required>
+        <option value="">Select</option>
+        <option value="target">Target</option>
+        <option value="habit">Habit</option>
+        <option value="project">Project</option>
+    </select>
+
+    <br><br>
+
+    <label>Target</label>
+    <input
+        type="number"
+        name="target_value"
+        step="any"
+        min="0"
+        placeholder="8"
+    >
+
+    <label>Unit</label>
+    <input
+        type="text"
+        name="unit"
+        placeholder="books"
+    >
+
+    <br><br>
+
+    <label>Start Date</label>
+    <input
+        type="date"
+        name="start_date"
+        value="{{ today.isoformat() }}"
+        required
+    >
+
+    <br><br>
+
+    <label>Deadline</label>
+    <input type="date" name="deadline">
+
+    <br><br>
+
+    <button type="submit">
+        Create Goal
+    </button>
+
+</form>
+
+<p>
+    <a href="{{ url_for('goals.index') }}">
+        Cancel
+    </a>
+</p>
+
+{% endblock %}
