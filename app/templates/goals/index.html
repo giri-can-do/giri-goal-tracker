@@ -61,6 +61,49 @@
 
                 ({{ activity.frequency }})
             </p>
+
+            <p>
+                <a href="{{ url_for(
+                    'goals.edit_activity',
+                    activity_id=activity.id
+                ) }}">
+                    Edit
+                </a>
+
+                {% if activity.is_active %}
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'goals.archive_activity',
+                            activity_id=activity.id
+                        ) }}"
+                        style="display:inline;"
+                    >
+                        <button type="submit">
+                            Archive
+                        </button>
+                    </form>
+
+                {% else %}
+
+                    <strong>Archived</strong>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for(
+                            'goals.restore_activity',
+                            activity_id=activity.id
+                        ) }}"
+                        style="display:inline;"
+                    >
+                        <button type="submit">
+                            Restore
+                        </button>
+                    </form>
+
+                {% endif %}
+            </p>
             {% endfor %}
 
         {% else %}

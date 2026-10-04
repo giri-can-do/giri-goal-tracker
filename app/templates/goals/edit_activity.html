@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Activity | Goal Tracker{% endblock %}
+
+{% block content %}
+
+<h1>Edit Activity</h1>
+
+<p>
+    Goal: <strong>{{ activity.goal.title }}</strong>
+</p>
+
+<form method="POST">
+
+    <label>Activity</label>
+    <input
+        type="text"
+        name="title"
+        value="{{ activity.title }}"
+        required
+    >
+
+    <br><br>
+
+    <label>How do you track it?</label>
+    <select name="measurement_type" required>
+
+        <option value="boolean"
+            {% if activity.measurement_type == "boolean" %}selected{% endif %}>
+            Complete / Not Complete
+        </option>
+
+        <option value="numeric"
+            {% if activity.measurement_type == "numeric" %}selected{% endif %}>
+            Number
+        </option>
+
+        <option value="duration"
+            {% if activity.measurement_type == "duration" %}selected{% endif %}>
+            Duration
+        </option>
+
+    </select>
+
+    <br><br>
+
+    <label>Target</label>
+    <input
+        type="number"
+        name="target_value"
+        min="0"
+        step="any"
+        value="{{ activity.target_value if activity.target_value is not none else '' }}"
+    >
+
+    <label>Unit</label>
+    <input
+        type="text"
+        name="unit"
+        value="{{ activity.unit or '' }}"
+    >
+
+    <br><br>
+
+    <label>Frequency</label>
+    <select name="frequency" required>
+
+        <option value="daily"
+            {% if activity.frequency == "daily" %}selected{% endif %}>
+            Every Day
+        </option>
+
+        <option value="weekly"
+            {% if activity.frequency == "weekly" %}selected{% endif %}>
+            Weekly
+        </option>
+
+    </select>
+
+    <br><br>
+
+    <button type="submit">
+        Save Changes
+    </button>
+
+</form>
+
+<p>
+    <a href="{{ url_for('goals.index') }}">
+        Cancel
+    </a>
+</p>
+
+{% endblock %}

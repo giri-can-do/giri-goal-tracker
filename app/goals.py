@@ -251,3 +251,134 @@ def edit(goal_id):
         return redirect(url_for("goals.index"))
 
     return render_template("goals/edit.html", goal=goal)
+
+@goals_bp.route(
+    "/activities/<int:activity_id>/edit",
+    methods=["GET", "POST"]
+)
+@login_required
+def edit_activity(activity_id):
+    activity = (
+        Activity.query
+        .filter_by(id=activity_id)
+        .filter(
+            Activity.goal.has(
+                user_id=current_user.id
+            )
+        )
+        .first_or_404()
+    )
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        measurement_type = request.form.get(
+            "measurement_type", ""
+        ).strip()
+
+        target_value_raw = request.form.get(
+            "target_value", ""
+        ).strip()
+
+        unit = request.form.get("unit", "").strip()
+        frequency = request.form.get("frequency", "").strip()
+
+        if not title or not measurement_type or not frequency:
+            flash(
+                "Activity, measurement type and frequency are required.",
+                "danger"
+            )
+            return render_template(
+                "goals/edit_activity.html",
+                activity=activity
+            )
+
+        try:
+            target_value = (
+                float(target_value_raw)
+                if target_value_raw
+                else None
+            )
+        except ValueError:
+            flash("Target must be a valid number.", "danger")
+            return render_template(
+                "goals/edit_activity.html",
+                activity=activity
+            )
+
+        if measurement_type in ("numeric", "duration"):
+            if target_value is None or target_value <= 0:
+                flash(
+                    "Numeric and duration activities require "
+                    "a target greater than 0.",
+                    "danger"
+                )
+                return render_template(
+                    "goals/edit_activity.html",
+                    activity=activity
+                )
+
+        activity.title = title
+        activity.measurement_type = measurement_type
+        activity.target_value = target_value
+        activity.unit = unit or None
+        activity.frequency = frequency
+
+        db.session.commit()
+
+        flash("Activity updated successfully.", "success")
+
+        return redirect(url_for("goals.index"))
+
+    return render_template(
+        "goals/edit_activity.html",
+        activity=activity
+    )
+
+@goals_bp.route(
+    "/activities/<int:activity_id>/archive",
+    methods=["POST"]
+)
+@login_required
+def archive_activity(activity_id):
+    activity = (
+        Activity.query
+        .filter_by(id=activity_id)
+        .filter(
+            Activity.goal.has(
+                user_id=current_user.id
+            )
+        )
+        .first_or_404()
+    )
+
+    activity.is_active = False
+    db.session.commit()
+
+    flash("Activity archived.", "success")
+
+    return redirect(url_for("goals.index"))
+
+
+@goals_bp.route(
+    "/activities/<int:activity_id>/restore",
+    methods=["POST"]
+)
+@login_required
+def restore_activity(activity_id):
+    activity = (
+        Activity.query
+        .filter_by(id=activity_id)
+        .filter(
+            Activity.goal.has(
+                user_id=current_user.id
+            )
+        )
+        .first_or_404()
+    )
+
+    activity.is_active = True
+    db.session.commit()
+
+    flash("Activity restored.", "success")
+
+    return redirect(url_for("goals.index"))

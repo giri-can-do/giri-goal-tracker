@@ -39,7 +39,6 @@ def index():
     activities = (
         Activity.query
         .filter(
-            Activity.is_active.is_(True),
             Activity.goal.has(
                 user_id=current_user.id
             ),
@@ -71,6 +70,12 @@ def index():
             entry.activity_id: entry
             for entry in daily_entries
         }
+
+        activities = [
+            activity
+            for activity in activities
+            if activity.is_active or activity.id in entries
+        ]
 
     previous_date = selected_date - timedelta(days=1)
 
