@@ -135,6 +135,24 @@ class Activity(db.Model):
         cascade="all, delete-orphan"
     )
 
+    def completion_percentage(self, entry):
+        if entry is None:
+            return 0
+
+        if self.measurement_type == "boolean":
+            return 100 if entry.value >= 1 else 0
+
+        if not self.target_value or self.target_value <= 0:
+            return 0
+
+        percentage = (entry.value / self.target_value) * 100
+
+        return min(round(percentage), 100)
+
+
+    def is_completed(self, entry):
+        return self.completion_percentage(entry) >= 100
+
 
 class DailyEntry(db.Model):
     __tablename__ = "daily_entries"

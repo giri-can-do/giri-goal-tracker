@@ -44,12 +44,32 @@ def index():
         .all()
     } if activities else {}
 
+    total_activities = len(activities)
+
+    completed_activities = sum(
+        1
+        for activity in activities
+        if activity.is_completed(
+            entries.get(activity.id)
+        )
+    )
+
+    if total_activities:
+        day_completion_percentage = round(
+            (completed_activities / total_activities) * 100
+        )
+    else:
+        day_completion_percentage = 0
+
     return render_template(
         "today/index.html",
         user=current_user,
         today=today,
         activities=activities,
-        entries=entries
+        entries=entries,
+        total_activities=total_activities,
+        completed_activities=completed_activities,
+        day_completion_percentage=day_completion_percentage
     )
 
 

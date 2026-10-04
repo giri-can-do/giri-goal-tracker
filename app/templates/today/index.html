@@ -12,6 +12,22 @@
 
 {% if activities %}
 
+    <p>
+        <strong>
+            {{ completed_activities }} / {{ total_activities }}
+        </strong>
+        activities completed
+    </p>
+
+    <p>
+        Daily Completion:
+        <strong>{{ day_completion_percentage }}%</strong>
+    </p>
+
+{% endif %}
+
+{% if activities %}
+
     {% for activity in activities %}
 
         {% set entry = entries.get(activity.id) %}
@@ -38,6 +54,27 @@
                 {{ entry.value }}
                 {{ activity.unit or "" }}
             </p>
+        {% endif %}
+
+        {% if entry %}
+
+            {% set percentage = activity.completion_percentage(entry) %}
+
+            <p>
+                Progress:
+                <strong>{{ percentage }}%</strong>
+
+                {% if activity.is_completed(entry) %}
+                    ✓
+                {% endif %}
+            </p>
+
+        {% else %}
+
+            <p>
+                Progress: <strong>0%</strong>
+            </p>
+
         {% endif %}
 
         <form

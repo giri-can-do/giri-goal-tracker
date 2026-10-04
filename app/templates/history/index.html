@@ -55,10 +55,16 @@
                         {{ activity.unit or "" }}
                     </strong>
 
-                    {% if activity.target_value
-                          and entry.value >= activity.target_value %}
-                        ✓
-                    {% endif %}
+                    {% set percentage = activity.completion_percentage(entry) %}
+
+                    <p>
+                        Completion:
+                        <strong>{{ percentage }}%</strong>
+
+                        {% if activity.is_completed(entry) %}
+                            ✓
+                        {% endif %}
+                    </p>
                 </p>
 
 
