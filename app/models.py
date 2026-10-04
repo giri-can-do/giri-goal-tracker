@@ -153,6 +153,43 @@ class Activity(db.Model):
     def is_completed(self, entry):
         return self.completion_percentage(entry) >= 100
 
+    def current_streak(self, today=None):
+        from datetime import date, timedelta
+
+        if today is None:
+            today = date.today()
+
+        if self.frequency != "daily":
+            return 0
+
+        entries = {
+            entry.entry_date: entry
+            for entry in self.daily_entries
+            if entry.entry_date <= today
+        }
+
+        streak = 0
+
+        # Today should not break an existing streak simply because
+        # the user has not completed today's activity yet.
+        today_entry = entries.get(today)
+
+        if today_entry and self.is_completed(today_entry):
+            check_date = today
+        else:
+            check_date = today - timedelta(days=1)
+
+        while check_date >= self.goal.start_date:
+            entry = entries.get(check_date)
+
+            if not entry or not self.is_completed(entry):
+                break
+
+            streak += 1
+            check_date -= timedelta(days=1)
+
+        return streak
+
 
 class DailyEntry(db.Model):
     __tablename__ = "daily_entries"

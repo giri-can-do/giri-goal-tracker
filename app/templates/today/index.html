@@ -77,6 +77,17 @@
 
         {% endif %}
 
+        {% set streak = activity.current_streak(today) %}
+
+        <p>
+            Streak:
+            {% if streak > 0 %}
+                <strong>🔥 {{ streak }} day{% if streak != 1 %}s{% endif %}</strong>
+            {% else %}
+                <strong>—</strong>
+            {% endif %}
+        </p>
+
         <form
             method="POST"
             action="{{ url_for('today.check_in', activity_id=activity.id) }}"
