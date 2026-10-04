@@ -25,9 +25,11 @@ def create_app():
     from app.auth import auth_bp
     from app.today import today_bp
     from app.goals import goals_bp
+    from app.history import history_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(today_bp)
     app.register_blueprint(goals_bp)
+    app.register_blueprint(history_bp)
 
     return app

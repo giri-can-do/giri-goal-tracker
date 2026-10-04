@@ -39,33 +39,39 @@
             <p>Deadline: {{ goal.deadline }}</p>
         {% endif %}
 
-	<h3>Activities</h3>
+        <p>
+            <a href="{{ url_for('goals.edit', goal_id=goal.id) }}">
+                Edit Goal
+            </a>
+        </p>
 
-	{% if goal.activities %}
+        <h3>Activities</h3>
 
-	    {% for activity in goal.activities %}
-		<p>
-		    {{ activity.title }}
+        {% if goal.activities %}
 
-		    {% if activity.target_value %}
-			—
-			{{ activity.target_value }}
-			{{ activity.unit or "" }}
-		    {% endif %}
+            {% for activity in goal.activities %}
+            <p>
+                {{ activity.title }}
 
-		    ({{ activity.frequency }})
-		</p>
-	    {% endfor %}
+                {% if activity.target_value %}
+                —
+                {{ activity.target_value }}
+                {{ activity.unit or "" }}
+                {% endif %}
 
-	{% else %}
-	    <p>No activities yet.</p>
-	{% endif %}
+                ({{ activity.frequency }})
+            </p>
+            {% endfor %}
 
-	<p>
-	    <a href="{{ url_for('goals.create_activity', goal_id=goal.id) }}">
-		+ Add Activity
-	    </a>
-	</p>
+        {% else %}
+            <p>No activities yet.</p>
+        {% endif %}
+
+        <p>
+            <a href="{{ url_for('goals.create_activity', goal_id=goal.id) }}">
+            + Add Activity
+            </a>
+        </p>
 
     {% endfor %}
 

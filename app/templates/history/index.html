@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}History | Goal Tracker{% endblock %}
+
+{% block content %}
+
+<h1>History</h1>
+
+<nav>
+    <a href="{{ url_for('history.index', date=previous_date.isoformat()) }}">
+        ← Previous Day
+    </a>
+
+    <strong>
+        {{ selected_date.strftime("%A, %B %d, %Y") }}
+    </strong>
+
+    {% if next_date %}
+        <a href="{{ url_for('history.index', date=next_date.isoformat()) }}">
+            Next Day →
+        </a>
+    {% endif %}
+</nav>
+
+<hr>
+
+{% if activities %}
+
+    {% for activity in activities %}
+
+        {% set entry = entries.get(activity.id) %}
+
+        <section>
+
+            <h2>{{ activity.title }}</h2>
+
+            <p>
+                Goal: {{ activity.goal.title }}
+            </p>
+
+            {% if activity.target_value %}
+                <p>
+                    Target:
+                    {{ activity.target_value }}
+                    {{ activity.unit or "" }}
+                </p>
+            {% endif %}
+
+            {% if entry %}
+
+                <p>
+                    Recorded:
+                    <strong>
+                        {{ entry.value }}
+                        {{ activity.unit or "" }}
+                    </strong>
+
+                    {% if activity.target_value
+                          and entry.value >= activity.target_value %}
+                        ✓
+                    {% endif %}
+                </p>
+
+
+            {% else %}
+
+                <p>No entry recorded.</p>
+
+            {% endif %}
+
+        </section>
+
+        <form
+            method="POST"
+            action="{{ url_for(
+                'history.save_entry',
+                activity_id=activity.id,
+                entry_date=selected_date.isoformat()
+            ) }}"
+        >
+
+            {% if activity.measurement_type == "boolean" %}
+
+                <input type="hidden" name="value" value="1">
+
+                <button type="submit">
+                    {% if entry and entry.value >= 1 %}
+                        ✓ Completed
+                    {% else %}
+                        Mark Complete
+                    {% endif %}
+                </button>
+
+            {% else %}
+
+                <input
+                    type="number"
+                    name="value"
+                    min="0"
+                    step="any"
+                    value="{{ entry.value if entry else '' }}"
+                    placeholder="{{ activity.target_value or 0 }}"
+                    required
+                >
+
+                <span>{{ activity.unit or "" }}</span>
+
+                <button type="submit">
+                    {% if entry %}
+                        Update
+                    {% else %}
+                        Add Entry
+                    {% endif %}
+                </button>
+
+            {% endif %}
+
+        </form>
+
+        <hr>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>
+        No activities existed on this date.
+    </p>
+
+{% endif %}
+
+{% endblock %}

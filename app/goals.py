@@ -178,3 +178,76 @@ def create_activity(goal_id):
         "goals/create_activity.html",
         goal=goal
     )
+
+@goals_bp.route("/<int:goal_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit(goal_id):
+    goal = Goal.query.filter_by(
+        id=goal_id,
+        user_id=current_user.id
+    ).first_or_404()
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        description = request.form.get("description", "").strip()
+        category = request.form.get("category", "").strip()
+        goal_type = request.form.get("goal_type", "").strip()
+
+        target_value_raw = request.form.get("target_value", "").strip()
+        unit = request.form.get("unit", "").strip()
+
+        start_date_raw = request.form.get("start_date", "").strip()
+        deadline_raw = request.form.get("deadline", "").strip()
+
+        if not title or not goal_type or not start_date_raw:
+            flash(
+                "Title, goal type and start date are required.",
+                "danger"
+            )
+            return render_template("goals/edit.html", goal=goal)
+
+        try:
+            target_value = (
+                float(target_value_raw)
+                if target_value_raw
+                else None
+            )
+
+            start_date = date.fromisoformat(start_date_raw)
+
+            deadline = (
+                date.fromisoformat(deadline_raw)
+                if deadline_raw
+                else None
+            )
+
+        except ValueError:
+            flash(
+                "Please check the target value and dates.",
+                "danger"
+            )
+            return render_template("goals/edit.html", goal=goal)
+
+        if deadline and deadline < start_date:
+            flash(
+                "Deadline cannot be earlier than the start date.",
+                "danger"
+            )
+            return render_template("goals/edit.html", goal=goal)
+
+        goal.title = title
+        goal.description = description or None
+        goal.category = category or None
+        goal.goal_type = goal_type
+        goal.target_value = target_value
+        goal.unit = unit or None
+        goal.start_date = start_date
+        goal.deadline = deadline
+
+        db.session.commit()
+
+        flash("Goal updated successfully.", "success")
+
+        return redirect(url_for("goals.index"))
+
+    return render_template("goals/edit.html", goal=goal)
