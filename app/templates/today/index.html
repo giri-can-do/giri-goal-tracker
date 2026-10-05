@@ -88,6 +88,25 @@
             {% endif %}
         </p>
 
+        {% set consistency = activity.consistency(7, today) %}
+
+        <p>
+            Consistency:
+            {% if consistency.eligible > 0 %}
+
+                <strong>
+                    {{ consistency.percentage }}%
+                </strong>
+
+                ({{ consistency.completed }}/{{ consistency.eligible }} days)
+
+            {% else %}
+
+                <strong>—</strong>
+
+            {% endif %}
+        </p>
+
         <form
             method="POST"
             action="{{ url_for('today.check_in', activity_id=activity.id) }}"

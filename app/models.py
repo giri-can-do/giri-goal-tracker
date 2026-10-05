@@ -190,6 +190,75 @@ class Activity(db.Model):
 
         return streak
 
+    def consistency(self, days=7, today=None):
+        from datetime import date, timedelta
+
+        if today is None:
+            today = date.today()
+
+        if self.frequency != "daily":
+            return {
+                "completed": 0,
+                "eligible": 0,
+                "percentage": 0
+            }
+
+        entries = {
+            entry.entry_date: entry
+            for entry in self.daily_entries
+            if entry.entry_date <= today
+        }
+
+        today_entry = entries.get(today)
+
+        # Include today only when today's target is already completed.
+        if today_entry and self.is_completed(today_entry):
+            end_date = today
+        else:
+            end_date = today - timedelta(days=1)
+
+        # Never look earlier than the goal start date.
+        window_start = end_date - timedelta(days=days - 1)
+
+        start_date = max(
+            self.goal.start_date,
+            window_start
+        )
+
+        if end_date < start_date:
+            return {
+                "completed": 0,
+                "eligible": 0,
+                "percentage": 0
+            }
+
+        eligible = 0
+        completed = 0
+
+        check_date = start_date
+
+        while check_date <= end_date:
+            eligible += 1
+
+            entry = entries.get(check_date)
+
+            if entry and self.is_completed(entry):
+                completed += 1
+
+            check_date += timedelta(days=1)
+
+        percentage = (
+            round((completed / eligible) * 100)
+            if eligible
+            else 0
+        )
+
+        return {
+            "completed": completed,
+            "eligible": eligible,
+            "percentage": percentage
+        }
+
 
 class DailyEntry(db.Model):
     __tablename__ = "daily_entries"
