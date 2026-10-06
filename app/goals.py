@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
@@ -122,6 +122,17 @@ def create_activity(goal_id):
         target_value_raw = request.form.get("target_value", "").strip()
         unit = request.form.get("unit", "").strip()
         frequency = request.form.get("frequency", "").strip()
+        start_date_str = request.form.get("start_date")
+
+        start_date = datetime.strptime(
+            start_date_str,
+            "%Y-%m-%d"
+        ).date()
+
+        # Validate the date
+        if start_date < goal.start_date:
+            flash("Activity start date cannot be before the goal start date.")
+            return redirect(request.url)
 
         if not title or not measurement_type or not frequency:
             flash(
@@ -164,7 +175,8 @@ def create_activity(goal_id):
             target_value=target_value,
             unit=unit or None,
             frequency=frequency,
-            is_active=True
+            is_active=True,
+            start_date=start_date,
         )
 
         db.session.add(activity)
@@ -271,6 +283,12 @@ def edit_activity(activity_id):
 
     if request.method == "POST":
         title = request.form.get("title", "").strip()
+
+        start_date = datetime.strptime(request.form["start_date"],"%Y-%m-%d").date()
+        if start_date < activity.goal.start_date:
+            flash("Activity start date cannot be before the goal start date.")
+            return redirect(request.url)
+        
         measurement_type = request.form.get(
             "measurement_type", ""
         ).strip()
@@ -318,6 +336,7 @@ def edit_activity(activity_id):
                 )
 
         activity.title = title
+        activity.start_date = start_date
         activity.measurement_type = measurement_type
         activity.target_value = target_value
         activity.unit = unit or None

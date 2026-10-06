@@ -74,7 +74,8 @@ def index():
         activities = [
             activity
             for activity in activities
-            if activity.is_active or activity.id in entries
+            if activity.start_date <= selected_date
+            and (activity.is_active or activity.id in entries)
         ]
 
     previous_date = selected_date - timedelta(days=1)

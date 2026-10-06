@@ -93,6 +93,7 @@ class Activity(db.Model):
     __tablename__ = "activities"
 
     id = db.Column(db.Integer, primary_key=True)
+    start_date = db.Column(db.Date, nullable=False)
 
     goal_id = db.Column(
         db.Integer,
@@ -179,7 +180,7 @@ class Activity(db.Model):
         else:
             check_date = today - timedelta(days=1)
 
-        while check_date >= self.goal.start_date:
+        while check_date >= self.start_date:
             entry = entries.get(check_date)
 
             if not entry or not self.is_completed(entry):
@@ -221,7 +222,7 @@ class Activity(db.Model):
         window_start = end_date - timedelta(days=days - 1)
 
         start_date = max(
-            self.goal.start_date,
+            self.start_date,
             window_start
         )
 

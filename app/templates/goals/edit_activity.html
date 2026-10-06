@@ -22,6 +22,17 @@
 
     <br><br>
 
+    <label for="start_date">Start Date</label>
+    <input
+        type="date"
+        id="start_date"
+        name="start_date"
+        value="{{ activity.start_date.isoformat() }}"
+        min="{{ activity.goal.start_date.isoformat() }}"
+        required
+    >
+    <br><br>
+
     <label>How do you track it?</label>
     <select name="measurement_type" required>
 
