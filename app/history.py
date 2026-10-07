@@ -75,6 +75,7 @@ def index():
             activity
             for activity in activities
             if activity.start_date <= selected_date
+            and activity.is_scheduled_for(selected_date)
             and (activity.is_active or activity.id in entries)
         ]
 
@@ -140,6 +141,18 @@ def save_entry(activity_id, entry_date):
             )
         )
 
+    if not activity.is_scheduled_for(selected_date):
+        flash(
+            "Progress cannot be recorded on a day when this activity is not scheduled.",
+            "danger"
+        )
+        return redirect(
+            url_for(
+                "history.index",
+                date=selected_date.isoformat()
+            )
+        )
+    
     value_raw = request.form.get("value", "").strip()
 
     try:

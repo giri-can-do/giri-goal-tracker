@@ -20,17 +20,23 @@ def index():
         .join(Activity.goal)
         .filter(
             Activity.is_active.is_(True),
-            Activity.frequency == "daily",
             Activity.goal.has(
                 user_id=current_user.id,
                 status="active"
             ),
             Activity.goal.has(
-		Goal.start_date <= today
+                Goal.start_date <= today
             )
         )
         .all()
     )
+
+    # Only include activities scheduled for today.
+    activities = [
+        activity
+        for activity in activities
+        if activity.is_scheduled_for(today)
+    ]
 
     entries = {
         entry.activity_id: entry

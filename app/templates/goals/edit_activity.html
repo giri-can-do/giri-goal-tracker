@@ -74,18 +74,21 @@
     <br><br>
 
     <label>Frequency</label>
-    <select name="frequency" required>
-
+   <select name="frequency" required>
         <option value="daily"
             {% if activity.frequency == "daily" %}selected{% endif %}>
             Every Day
         </option>
 
-        <option value="weekly"
-            {% if activity.frequency == "weekly" %}selected{% endif %}>
-            Weekly
+        <option value="weekdays"
+            {% if activity.frequency == "weekdays" %}selected{% endif %}>
+            Weekdays
         </option>
 
+        <option value="weekends"
+            {% if activity.frequency == "weekends" %}selected{% endif %}>
+            Weekends
+        </option>
     </select>
 
     <br><br>

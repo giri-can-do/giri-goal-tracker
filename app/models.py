@@ -154,14 +154,26 @@ class Activity(db.Model):
     def is_completed(self, entry):
         return self.completion_percentage(entry) >= 100
 
+    def is_scheduled_for(self, check_date):
+        if check_date < self.start_date:
+            return False
+
+        if self.frequency == "daily":
+            return True
+
+        if self.frequency == "weekdays":
+            return check_date.weekday() < 5
+
+        if self.frequency == "weekends":
+            return check_date.weekday() >= 5
+
+        return False
+
     def current_streak(self, today=None):
         from datetime import date, timedelta
 
         if today is None:
             today = date.today()
-
-        if self.frequency != "daily":
-            return 0
 
         entries = {
             entry.entry_date: entry
@@ -171,16 +183,26 @@ class Activity(db.Model):
 
         streak = 0
 
-        # Today should not break an existing streak simply because
-        # the user has not completed today's activity yet.
+        # If today is scheduled and completed, start from today.
+        # Otherwise search backward for the most recent scheduled day.
         today_entry = entries.get(today)
 
-        if today_entry and self.is_completed(today_entry):
+        if (
+            self.is_scheduled_for(today)
+            and today_entry
+            and self.is_completed(today_entry)
+        ):
             check_date = today
         else:
             check_date = today - timedelta(days=1)
 
         while check_date >= self.start_date:
+
+            # Unscheduled days neither count nor break the streak.
+            if not self.is_scheduled_for(check_date):
+                check_date -= timedelta(days=1)
+                continue
+
             entry = entries.get(check_date)
 
             if not entry or not self.is_completed(entry):
@@ -197,13 +219,6 @@ class Activity(db.Model):
         if today is None:
             today = date.today()
 
-        if self.frequency != "daily":
-            return {
-                "completed": 0,
-                "eligible": 0,
-                "percentage": 0
-            }
-
         entries = {
             entry.entry_date: entry
             for entry in self.daily_entries
@@ -212,13 +227,17 @@ class Activity(db.Model):
 
         today_entry = entries.get(today)
 
-        # Include today only when today's target is already completed.
-        if today_entry and self.is_completed(today_entry):
+        # Include today only when today's scheduled target
+        # has already been completed.
+        if (
+            self.is_scheduled_for(today)
+            and today_entry
+            and self.is_completed(today_entry)
+        ):
             end_date = today
         else:
             end_date = today - timedelta(days=1)
 
-        # Never look earlier than the goal start date.
         window_start = end_date - timedelta(days=days - 1)
 
         start_date = max(
@@ -239,12 +258,15 @@ class Activity(db.Model):
         check_date = start_date
 
         while check_date <= end_date:
-            eligible += 1
 
-            entry = entries.get(check_date)
+            # Only scheduled days belong in the denominator.
+            if self.is_scheduled_for(check_date):
+                eligible += 1
 
-            if entry and self.is_completed(entry):
-                completed += 1
+                entry = entries.get(check_date)
+
+                if entry and self.is_completed(entry):
+                    completed += 1
 
             check_date += timedelta(days=1)
 

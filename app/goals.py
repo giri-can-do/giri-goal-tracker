@@ -121,7 +121,18 @@ def create_activity(goal_id):
         measurement_type = request.form.get("measurement_type", "").strip()
         target_value_raw = request.form.get("target_value", "").strip()
         unit = request.form.get("unit", "").strip()
+        
         frequency = request.form.get("frequency", "").strip()
+        valid_frequencies = {
+            "daily",
+            "weekdays",
+            "weekends"
+        }
+
+        if frequency not in valid_frequencies:
+            flash("Please select a valid frequency.", "danger")
+            return redirect(request.url)
+
         start_date_str = request.form.get("start_date")
 
         start_date = datetime.strptime(
@@ -299,6 +310,15 @@ def edit_activity(activity_id):
 
         unit = request.form.get("unit", "").strip()
         frequency = request.form.get("frequency", "").strip()
+        valid_frequencies = {
+            "daily",
+            "weekdays",
+            "weekends"
+        }
+
+        if frequency not in valid_frequencies:
+            flash("Please select a valid frequency.", "danger")
+            return redirect(request.url)
 
         if not title or not measurement_type or not frequency:
             flash(
