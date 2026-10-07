@@ -4,157 +4,299 @@
 
 {% block content %}
 
-<h1>Good to see you, {{ user.username }} 👋</h1>
+<section class="today-header">
+    <div>
+        <p class="page-eyebrow">TODAY</p>
 
-<h2>Today</h2>
+        <h1>
+            Good to see you,
+            <span class="greeting-user">
+                {{ user.username }} 👋
+            </span>
+        </h1>
 
-<p>{{ today.strftime("%A, %B %d, %Y") }}</p>
+        <p class="today-date">
+            {{ today.strftime("%A, %B %d, %Y") }}
+        </p>
+    </div>
+</section>
+
 
 {% if activities %}
 
-    <p>
-        <strong>
-            {{ completed_activities }} / {{ total_activities }}
-        </strong>
-        activities completed
-    </p>
+    <!-- =========================
+         Daily Summary
+    ========================== -->
 
-    <p>
-        Daily Completion:
-        <strong>{{ day_completion_percentage }}%</strong>
-    </p>
+    <section class="daily-summary">
 
-{% endif %}
+        <div class="summary-header">
+            <div>
+                <p class="summary-label">
+                    Today's Progress
+                </p>
 
-{% if activities %}
+                <p class="summary-count">
+                    <strong>{{ completed_activities }}</strong>
+                    of
+                    <strong>{{ total_activities }}</strong>
+                    activities completed
+                </p>
+            </div>
 
-    {% for activity in activities %}
+            <div class="summary-percentage">
+                {{ day_completion_percentage }}%
+            </div>
+        </div>
 
-        {% set entry = entries.get(activity.id) %}
+        <div class="progress-track progress-track-large">
+            <div
+                class="progress-fill {% if day_completion_percentage < 100 %}progress-incomplete{% endif %}"
+                style="width: {{ day_completion_percentage }}%;"
+            ></div>
+        </div>
 
-        <hr>
-
-        <h3>{{ activity.title }}</h3>
-
-        <p>
-            Goal: {{ activity.goal.title }}
-        </p>
-
-        {% if activity.target_value %}
-            <p>
-                Target:
-                {{ activity.target_value }}
-                {{ activity.unit or "" }}
+        {% if completed_activities == total_activities %}
+            <p class="day-complete-message">
+                ✓ All activities completed for today
             </p>
         {% endif %}
 
-        {% if entry %}
-            <p>
-                Today:
-                {{ entry.value }}
-                {{ activity.unit or "" }}
-            </p>
-        {% endif %}
+    </section>
 
-        {% if entry %}
 
-            {% set percentage = activity.completion_percentage(entry) %}
+    <!-- =========================
+         Activity Cards
+    ========================== -->
 
-            <p>
-                Progress:
-                <strong>{{ percentage }}%</strong>
+    <section class="activity-grid">
 
-                {% if activity.is_completed(entry) %}
-                    ✓
-                {% endif %}
-            </p>
+        {% for activity in activities %}
 
-        {% else %}
+            {% set entry = entries.get(activity.id) %}
 
-            <p>
-                Progress: <strong>0%</strong>
-            </p>
-
-        {% endif %}
-
-        {% set streak = activity.current_streak(today) %}
-
-        <p>
-            Streak:
-            {% if streak > 0 %}
-                <strong>🔥 {{ streak }} day{% if streak != 1 %}s{% endif %}</strong>
+            {% if entry %}
+                {% set percentage = activity.completion_percentage(entry) %}
             {% else %}
-                <strong>—</strong>
+                {% set percentage = 0 %}
             {% endif %}
-        </p>
 
-        {% set consistency = activity.consistency(7, today) %}
+            {% set completed = activity.is_completed(entry) %}
+            {% set streak = activity.current_streak(today) %}
+            {% set consistency = activity.consistency(7, today) %}
 
-        <p>
-            Consistency:
-            {% if consistency.eligible > 0 %}
 
-                <strong>
-                    {{ consistency.percentage }}%
-                </strong>
+            <article class="activity-card {% if completed %}activity-completed{% endif %}">
 
-                ({{ consistency.completed }}/{{ consistency.eligible }} days)
+                <!-- Card Header -->
 
-            {% else %}
+                <div class="activity-card-header">
 
-                <strong>—</strong>
+                    <div>
+                        <div class="activity-title-row">
 
-            {% endif %}
-        </p>
+                            <h2 class="activity-title">
+                                {{ activity.title }}
+                            </h2>
 
-        <form
-            method="POST"
-            action="{{ url_for('today.check_in', activity_id=activity.id) }}"
-        >
+                            {% if completed %}
+                                <span class="completed-badge">
+                                    ✓ Completed
+                                </span>
+                            {% endif %}
 
-            {% if activity.measurement_type == "boolean" %}
+                        </div>
 
-                <input type="hidden" name="value" value="1">
+                        <p class="activity-goal">
+                            {{ activity.goal.title }}
+                        </p>
+                    </div>
 
-                <button type="submit">
-                    {% if entry and entry.value >= 1 %}
-                        ✓ Completed
-                    {% else %}
-                        Mark Complete
-                    {% endif %}
-                </button>
+                </div>
 
-            {% else %}
 
-                <input
-                    type="number"
-                    name="value"
-                    min="0"
-                    step="any"
-                    value="{{ entry.value if entry else '' }}"
-                    placeholder="{{ activity.target_value or 0 }}"
-                    required
+                <!-- Progress -->
+
+                <div class="activity-progress">
+
+                    <div class="progress-values">
+
+                        <div>
+                            <span class="current-value">
+                                {{ (entry.value if entry else 0) | number }}
+                            </span>
+
+                            {% if activity.target_value %}
+                                <span class="target-value">
+                                    / {{ activity.target_value | number }}
+                                </span>
+                            {% endif %}
+
+                            {% if activity.unit %}
+                                <span class="progress-unit">
+                                    {{ activity.unit }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <strong class="activity-percentage">
+                            {{ percentage }}%
+                        </strong>
+
+                    </div>
+
+                    <div class="progress-track">
+                        <div
+                            class="progress-fill {% if not completed %}progress-incomplete{% endif %}"
+                            style="width: {{ percentage }}%;"
+                        ></div>
+                    </div>
+
+                </div>
+
+
+                <!-- Stats -->
+
+                <div class="activity-stats">
+
+                    <div class="stat">
+                        <span class="stat-icon">🔥</span>
+
+                        <div>
+                            <span class="stat-label">
+                                Streak
+                            </span>
+
+                            <strong>
+                                {% if streak > 0 %}
+                                    {{ streak }}
+                                    day{% if streak != 1 %}s{% endif %}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+
+
+                    <div class="stat">
+                        <span class="stat-icon">📅</span>
+
+                        <div>
+                            <span class="stat-label">
+                                Consistency
+                            </span>
+
+                            <strong>
+                                {% if consistency.eligible > 0 %}
+                                    {{ consistency.percentage }}%
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </strong>
+
+                            {% if consistency.eligible > 0 %}
+                                <small>
+                                    {{ consistency.completed }}/{{ consistency.eligible }}
+                                    days
+                                </small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- Check-in -->
+
+                <form
+                    class="activity-checkin"
+                    method="POST"
+                    action="{{ url_for('today.check_in', activity_id=activity.id) }}"
                 >
 
-                <span>{{ activity.unit or "" }}</span>
+                    {% if activity.measurement_type == "boolean" %}
 
-                <button type="submit">
-                    Update
-                </button>
+                        <input
+                            type="hidden"
+                            name="value"
+                            value="1"
+                        >
 
-            {% endif %}
+                        <button
+                            class="primary-button full-button"
+                            type="submit"
+                        >
+                            {% if entry and entry.value >= 1 %}
+                                ✓ Completed
+                            {% else %}
+                                Mark Complete
+                            {% endif %}
+                        </button>
 
-        </form>
+                    {% else %}
 
-    {% endfor %}
+                        <div class="value-input-group">
+
+                            <input
+                                class="progress-input"
+                                type="number"
+                                name="value"
+                                min="0"
+                                step="any"
+                                value="{{ entry.value if entry else '' }}"
+                                placeholder="{{ activity.target_value or 0 }}"
+                                required
+                            >
+
+                            {% if activity.unit %}
+                                <span class="input-unit">
+                                    {{ activity.unit }}
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+                        <button
+                            class="primary-button"
+                            type="submit"
+                        >
+                            Update
+                        </button>
+
+                    {% endif %}
+
+                </form>
+
+            </article>
+
+        {% endfor %}
+
+    </section>
+
 
 {% else %}
 
-    <p>No activities for today.</p>
+    <section class="empty-state">
 
-    <a href="{{ url_for('goals.create') }}">
-        + Create Goal
-    </a>
+        <div class="empty-icon">
+            🎯
+        </div>
+
+        <h2>Nothing scheduled today</h2>
+
+        <p>
+            Enjoy the breathing room, or add another activity to your goals.
+        </p>
+
+        <a
+            class="primary-button"
+            href="{{ url_for('goals.create') }}"
+        >
+            + Create Goal
+        </a>
+
+    </section>
 
 {% endif %}
 

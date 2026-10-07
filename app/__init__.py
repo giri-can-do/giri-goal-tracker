@@ -14,6 +14,7 @@ login_manager = LoginManager()
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    app.jinja_env.filters["number"] = format_number
 
     db.init_app(app)
     migrate.init_app(app, db)
@@ -33,3 +34,19 @@ def create_app():
     app.register_blueprint(history_bp)
 
     return app
+
+def format_number(value):
+    if value is None:
+        return ""
+
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return value
+
+    # Whole number
+    if number.is_integer():
+        return f"{int(number):,}"
+
+    # Decimal number
+    return f"{number:,.2f}".rstrip("0").rstrip(".")

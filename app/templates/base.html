@@ -14,25 +14,52 @@
 
 <body>
 
-    <header>
-        <a href="{{ url_for('today.index') }}">
-            🎯 Goal Tracker
-        </a>
+    <header class="app-header">
+        <div class="header-container">
 
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('auth.logout') }}">Logout</a>
-        {% endif %}
+            <a
+                class="brand"
+                href="{{ url_for('today.index') }}"
+            >
+                <span class="brand-icon">🎯</span>
+                <span>Goal Tracker</span>
+            </a>
+
+            {% if current_user.is_authenticated %}
+
+                <nav class="main-nav">
+                    <a href="{{ url_for('today.index') }}">
+                        Today
+                    </a>
+
+                    <a href="{{ url_for('goals.index') }}">
+                        Goals
+                    </a>
+
+                    <a href="{{ url_for('history.index') }}">
+                        History
+                    </a>
+                </nav>
+
+                <div class="user-nav">
+                    <span class="username">
+                        {{ current_user.username }}
+                    </span>
+
+                    <a
+                        class="logout-link"
+                        href="{{ url_for('auth.logout') }}"
+                    >
+                        Logout
+                    </a>
+                </div>
+
+            {% endif %}
+
+        </div>
     </header>
 
-    <main>
-
-	{% if current_user.is_authenticated %}
-	    <a href="{{ url_for('today.index') }}">Today</a>
-        <a href="{{ url_for('goals.index') }}">Goals</a>
-        <a href="{{ url_for('history.index') }}">History</a>
-        <a href="{{ url_for('auth.logout') }}">Logout</a>
-	{% endif %}
-
+    <main class="page-container">
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% for category, message in messages %}

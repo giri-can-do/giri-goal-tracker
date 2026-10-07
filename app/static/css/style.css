@@ -1,0 +1,696 @@
+/* ================================
+   Goal Tracker
+   Global UI
+================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    margin: 0;
+    background: #f7f8fa;
+    color: #1f2937;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+
+    line-height: 1.5;
+}
+
+
+/* ================================
+   Header
+================================ */
+
+.app-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.header-container {
+    max-width: 1180px;
+    min-height: 68px;
+
+    margin: 0 auto;
+    padding: 0 24px;
+
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+
+/* Brand */
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    color: #111827;
+    font-size: 20px;
+    font-weight: 700;
+
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.brand-icon {
+    font-size: 24px;
+}
+
+
+/* Main Navigation */
+
+.main-nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.main-nav a {
+    padding: 8px 12px;
+
+    color: #6b7280;
+    font-size: 15px;
+    font-weight: 500;
+
+    text-decoration: none;
+    border-radius: 8px;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+.main-nav a:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+
+/* User Area */
+
+.user-nav {
+    margin-left: auto;
+
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    font-size: 14px;
+}
+
+.username {
+    color: #6b7280;
+}
+
+.logout-link {
+    color: #374151;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.logout-link:hover {
+    color: #111827;
+}
+
+
+/* ================================
+   Main Page
+================================ */
+
+.page-container {
+    width: 100%;
+    max-width: 1180px;
+
+    margin: 0 auto;
+    padding: 42px 24px 64px;
+}
+
+
+/* Temporary typography
+   We'll refine this with Today UI.
+================================ */
+
+h1 {
+    margin-top: 0;
+    margin-bottom: 12px;
+
+    color: #111827;
+    font-size: 36px;
+    line-height: 1.2;
+}
+
+h2 {
+    color: #111827;
+}
+
+h3 {
+    color: #111827;
+}
+
+
+/* ================================
+   Flash Messages
+================================ */
+
+.flash {
+    margin-bottom: 20px;
+    padding: 12px 16px;
+
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+}
+
+.flash.success {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #166534;
+}
+
+.flash.danger {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+
+/* ================================
+   Mobile
+================================ */
+
+@media (max-width: 700px) {
+
+    .header-container {
+        padding: 14px 18px;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .brand {
+        font-size: 18px;
+    }
+
+    .main-nav {
+        order: 3;
+        width: 100%;
+    }
+
+    .main-nav a {
+        flex: 1;
+        text-align: center;
+    }
+
+    .user-nav {
+        margin-left: auto;
+    }
+
+    .username {
+        display: none;
+    }
+
+    .page-container {
+        padding: 28px 18px 48px;
+    }
+
+    h1 {
+        font-size: 28px;
+    }
+}
+
+/* ================================
+   Today Page
+================================ */
+
+.today-header {
+    margin-bottom: 28px;
+}
+
+.page-eyebrow {
+    margin: 0 0 8px;
+
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.today-header h1 {
+    margin-bottom: 8px;
+}
+
+.today-date {
+    margin: 0;
+    color: #6b7280;
+    font-size: 16px;
+}
+
+.greeting-user {
+    white-space: nowrap;
+}
+
+/* ================================
+   Daily Summary
+================================ */
+
+.daily-summary {
+    margin-bottom: 30px;
+    padding: 24px 26px;
+
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+}
+
+.summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+
+    margin-bottom: 18px;
+}
+
+.summary-label {
+    margin: 0 0 4px;
+
+    color: #111827;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.summary-count {
+    margin: 0;
+
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.summary-percentage {
+    color: #111827;
+    font-size: 30px;
+    font-weight: 750;
+}
+
+
+/* ================================
+   Progress Bars
+================================ */
+
+.progress-track {
+    width: 100%;
+    height: 8px;
+
+    overflow: hidden;
+
+    background: #e5e7eb;
+    border-radius: 999px;
+}
+
+.progress-track-large {
+    height: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+
+    background: #22c55e;
+    border-radius: inherit;
+
+    transition: width 0.3s ease;
+}
+
+.day-complete-message {
+    margin: 12px 0 0;
+
+    color: #15803d;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* ================================
+   Activity Grid
+================================ */
+
+.activity-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+}
+
+
+/* ================================
+   Activity Card
+================================ */
+
+.activity-card {
+    padding: 24px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.activity-card:hover {
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+.activity-completed {
+    border-color: #bbf7d0;
+}
+
+
+/* Card Header */
+
+.activity-card-header {
+    margin-bottom: 26px;
+}
+
+.activity-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.activity-title {
+    margin: 0;
+
+    color: #111827;
+    font-size: 20px;
+}
+
+.activity-goal {
+    margin: 5px 0 0;
+
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.completed-badge {
+    padding: 5px 9px;
+
+    background: #f0fdf4;
+
+    color: #15803d;
+
+    border: 1px solid #bbf7d0;
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+/* ================================
+   Activity Progress
+================================ */
+
+.activity-progress {
+    margin-bottom: 24px;
+}
+
+.progress-values {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-bottom: 10px;
+}
+
+.current-value {
+    color: #111827;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.target-value,
+.progress-unit {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.activity-percentage {
+    color: #374151;
+    font-size: 14px;
+}
+
+.progress-incomplete {
+    background: #f59e0b;
+}
+
+/* ================================
+   Activity Stats
+================================ */
+
+.activity-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px;
+
+    margin-bottom: 24px;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 12px;
+
+    background: #f9fafb;
+    border-radius: 10px;
+}
+
+.stat-icon {
+    font-size: 20px;
+}
+
+.stat div {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    color: #6b7280;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.stat strong {
+    color: #111827;
+    font-size: 14px;
+}
+
+.stat small {
+    color: #9ca3af;
+    font-size: 11px;
+}
+
+
+/* ================================
+   Check-in
+================================ */
+
+.activity-checkin {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+
+    padding-top: 20px;
+
+    border-top: 1px solid #f0f1f3;
+}
+
+.value-input-group {
+    min-width: 0;
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+
+    background: #ffffff;
+
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+
+    overflow: hidden;
+}
+
+.value-input-group:focus-within {
+    border-color: #9ca3af;
+}
+
+.progress-input {
+    min-width: 0;
+    width: 100%;
+
+    padding: 10px 12px;
+
+    color: #111827;
+    font: inherit;
+
+    border: 0;
+    outline: none;
+}
+
+.input-unit {
+    padding-right: 12px;
+
+    color: #6b7280;
+    font-size: 13px;
+}
+
+
+/* ================================
+   Buttons
+================================ */
+
+.primary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 16px;
+
+    background: #111827;
+    color: #ffffff;
+
+    border: 0;
+    border-radius: 9px;
+
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none;
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        transform 0.1s ease;
+}
+
+.primary-button:hover {
+    background: #374151;
+}
+
+.primary-button:active {
+    transform: translateY(1px);
+}
+
+.full-button {
+    width: 100%;
+}
+
+
+/* ================================
+   Empty State
+================================ */
+
+.empty-state {
+    padding: 60px 24px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+
+    text-align: center;
+}
+
+.empty-icon {
+    margin-bottom: 12px;
+    font-size: 38px;
+}
+
+.empty-state h2 {
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    margin: 0 0 22px;
+    color: #6b7280;
+}
+
+
+/* ================================
+   Today Mobile
+================================ */
+
+@media (max-width: 760px) {
+
+    .activity-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .daily-summary {
+        padding: 20px;
+    }
+
+    .summary-percentage {
+        font-size: 26px;
+    }
+
+    .activity-card {
+        padding: 20px;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .today-header h1 {
+        font-size: 30px;
+        line-height: 1.2;
+    }
+
+    .summary-header {
+        align-items: flex-start;
+    }
+
+    .activity-title-row {
+        align-items: flex-start;
+    }
+
+    .activity-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .activity-checkin {
+        flex-direction: column;
+    }
+
+    .primary-button {
+        min-height: 42px;
+    }
+}
