@@ -4,123 +4,304 @@
 
 {% block content %}
 
-<h1>My Goals</h1>
+<section class="goals-page-header">
 
-<p>
-    <a href="{{ url_for('goals.create') }}">+ Create Goal</a>
-</p>
+    <div>
+        <p class="page-eyebrow">GOALS</p>
+        <h1>My Goals</h1>
+
+        <p class="page-description">
+            Manage your goals and the activities that move them forward.
+        </p>
+    </div>
+
+    <a
+        class="primary-button"
+        href="{{ url_for('goals.create') }}"
+    >
+        + Create Goal
+    </a>
+
+</section>
+
 
 {% if goals %}
 
-    {% for goal in goals %}
-        <hr>
+    <section class="goals-grid">
 
-        <h2>{{ goal.title }}</h2>
+        {% for goal in goals %}
 
-        {% if goal.category %}
-            <p>Category: {{ goal.category }}</p>
-        {% endif %}
+            <article class="goal-card">
 
-        <p>Type: {{ goal.goal_type }}</p>
+                <!-- =========================
+                     Goal Header
+                ========================== -->
 
-        {% if goal.target_value %}
-            <p>
-                Target:
-                {{ goal.target_value }}
-                {{ goal.unit or "" }}
-            </p>
-        {% endif %}
+                <div class="goal-card-header">
 
-        <p>Status: {{ goal.status }}</p>
+                    <div>
+                        <div class="goal-title-row">
 
-        <p>Start: {{ goal.start_date }}</p>
+                            <h2 class="goal-title">
+                                {{ goal.title }}
+                            </h2>
 
-        {% if goal.deadline %}
-            <p>Deadline: {{ goal.deadline }}</p>
-        {% endif %}
+                            <span class="goal-status goal-status-{{ goal.status }}">
+                                {{ goal.status | title }}
+                            </span>
 
-        <p>
-            <a href="{{ url_for('goals.edit', goal_id=goal.id) }}">
-                Edit Goal
-            </a>
-        </p>
+                        </div>
 
-        <h3>Activities</h3>
+                        {% if goal.category %}
+                            <p class="goal-category">
+                                {{ goal.category }}
+                            </p>
+                        {% endif %}
+                    </div>
 
-        {% if goal.activities %}
-
-            {% for activity in goal.activities %}
-            <p>
-                {{ activity.title }}
-
-                {% if activity.target_value %}
-                —
-                {{ activity.target_value }}
-                {{ activity.unit or "" }}
-                {% endif %}
-
-                ({{ activity.frequency }})
-            </p>
-
-            <p>
-                <a href="{{ url_for(
-                    'goals.edit_activity',
-                    activity_id=activity.id
-                ) }}">
-                    Edit
-                </a>
-
-                {% if activity.is_active %}
-
-                    <form
-                        method="POST"
-                        action="{{ url_for(
-                            'goals.archive_activity',
-                            activity_id=activity.id
-                        ) }}"
-                        style="display:inline;"
+                    <a
+                        class="secondary-button"
+                        href="{{ url_for('goals.edit', goal_id=goal.id) }}"
                     >
-                        <button type="submit">
-                            Archive
-                        </button>
-                    </form>
+                        Edit Goal
+                    </a>
 
-                {% else %}
+                </div>
 
-                    <strong>Archived</strong>
 
-                    <form
-                        method="POST"
-                        action="{{ url_for(
-                            'goals.restore_activity',
-                            activity_id=activity.id
-                        ) }}"
-                        style="display:inline;"
-                    >
-                        <button type="submit">
-                            Restore
-                        </button>
-                    </form>
+                <!-- =========================
+                     Goal Details
+                ========================== -->
 
-                {% endif %}
-            </p>
-            {% endfor %}
+                <div class="goal-meta">
 
-        {% else %}
-            <p>No activities yet.</p>
-        {% endif %}
+                    <div class="goal-meta-item">
+                        <span class="meta-label">Type</span>
 
-        <p>
-            <a href="{{ url_for('goals.create_activity', goal_id=goal.id) }}">
-            + Add Activity
-            </a>
-        </p>
+                        <strong>
+                            {{ goal.goal_type | title }}
+                        </strong>
+                    </div>
 
-    {% endfor %}
+
+                    {% if goal.target_value %}
+
+                        <div class="goal-meta-item">
+                            <span class="meta-label">Target</span>
+
+                            <strong>
+                                {{ goal.target_value | number }}
+                                {{ goal.unit or "" }}
+                            </strong>
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="goal-meta-item">
+                        <span class="meta-label">Start</span>
+
+                        <strong>
+                            {{ goal.start_date.strftime("%b %d, %Y") }}
+                        </strong>
+                    </div>
+
+
+                    {% if goal.deadline %}
+
+                        <div class="goal-meta-item">
+                            <span class="meta-label">Deadline</span>
+
+                            <strong>
+                                {{ goal.deadline.strftime("%b %d, %Y") }}
+                            </strong>
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =========================
+                     Activities
+                ========================== -->
+
+                <div class="goal-activities">
+
+                    <div class="activities-heading">
+
+                        <div>
+                            <h3>Activities</h3>
+
+                            <p>
+                                Daily actions connected to this goal.
+                            </p>
+                        </div>
+
+                        <a
+                            class="add-activity-link"
+                            href="{{ url_for(
+                                'goals.create_activity',
+                                goal_id=goal.id
+                            ) }}"
+                        >
+                            + Add Activity
+                        </a>
+
+                    </div>
+
+
+                    {% if goal.activities %}
+
+                        <div class="activity-list">
+
+                            {% for activity in goal.activities %}
+
+                                <div class="
+                                    goal-activity-row
+                                    {% if not activity.is_active %}
+                                        archived-activity
+                                    {% endif %}
+                                ">
+
+                                    <div class="goal-activity-info">
+
+                                        <div class="goal-activity-title-row">
+
+                                            <strong class="goal-activity-title">
+                                                {{ activity.title }}
+                                            </strong>
+
+                                            {% if not activity.is_active %}
+                                                <span class="archived-badge">
+                                                    Archived
+                                                </span>
+                                            {% endif %}
+
+                                        </div>
+
+
+                                        <div class="activity-details">
+
+                                            {% if activity.target_value %}
+                                                <span>
+                                                    {{ activity.target_value | number }}
+                                                    {{ activity.unit or "" }}
+                                                </span>
+                                            {% endif %}
+
+                                            <span class="frequency-badge">
+                                                {{ activity.frequency | title }}
+                                            </span>
+
+                                            {% if activity.start_date %}
+                                                <span>
+                                                    Started
+                                                    {{ activity.start_date.strftime("%b %d") }}
+                                                </span>
+                                            {% endif %}
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="activity-actions">
+
+                                        <a
+                                            class="text-button"
+                                            href="{{ url_for(
+                                                'goals.edit_activity',
+                                                activity_id=activity.id
+                                            ) }}"
+                                        >
+                                            Edit
+                                        </a>
+
+
+                                        {% if activity.is_active %}
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for(
+                                                    'goals.archive_activity',
+                                                    activity_id=activity.id
+                                                ) }}"
+                                            >
+                                                <button
+                                                    class="text-button danger-text"
+                                                    type="submit"
+                                                >
+                                                    Archive
+                                                </button>
+                                            </form>
+
+                                        {% else %}
+
+                                            <form
+                                                method="POST"
+                                                action="{{ url_for(
+                                                    'goals.restore_activity',
+                                                    activity_id=activity.id
+                                                ) }}"
+                                            >
+                                                <button
+                                                    class="text-button restore-text"
+                                                    type="submit"
+                                                >
+                                                    Restore
+                                                </button>
+                                            </form>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="activities-empty">
+                            No activities yet.
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </article>
+
+        {% endfor %}
+
+    </section>
+
 
 {% else %}
 
-    <p>You haven't created any goals yet.</p>
+    <section class="empty-state">
+
+        <div class="empty-icon">
+            🎯
+        </div>
+
+        <h2>No goals yet</h2>
+
+        <p>
+            Create your first goal and start building consistent progress.
+        </p>
+
+        <a
+            class="primary-button"
+            href="{{ url_for('goals.create') }}"
+        >
+            + Create Goal
+        </a>
+
+    </section>
 
 {% endif %}
 

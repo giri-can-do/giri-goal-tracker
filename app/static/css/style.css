@@ -693,4 +693,479 @@ h3 {
     .primary-button {
         min-height: 42px;
     }
+
+    .goal-activity-row {
+        gap: 8px;
+    }
+
+    .activity-actions {
+        margin-top: 2px;
+    }
+
+    .activity-details {
+        row-gap: 5px;
+    }
+
+    .goal-meta-item:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+    }
+
+    .goal-card-header {
+        gap: 16px;
+    }
+}
+
+/* ================================
+   Goals Page
+================================ */
+
+.goals-page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+
+    margin-bottom: 30px;
+}
+
+.goals-page-header h1 {
+    margin-bottom: 8px;
+}
+
+.page-description {
+    margin: 0;
+    color: #6b7280;
+}
+
+
+/* ================================
+   Goals Grid
+================================ */
+
+.goals-grid {
+    display: grid;
+    gap: 22px;
+}
+
+
+/* ================================
+   Goal Card
+================================ */
+
+.goal-card {
+    padding: 26px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+}
+
+.goal-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+
+    margin-bottom: 24px;
+}
+
+.goal-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.goal-title {
+    margin: 0;
+
+    color: #111827;
+    font-size: 22px;
+}
+
+.goal-category {
+    margin: 6px 0 0;
+
+    color: #6b7280;
+    font-size: 14px;
+}
+
+
+/* ================================
+   Goal Status
+================================ */
+
+.goal-status {
+    display: inline-flex;
+
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.goal-status-active {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.goal-status-completed {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.goal-status-paused {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+
+/* ================================
+   Goal Metadata
+================================ */
+
+.goal-meta {
+    display: grid;
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-bottom: 28px;
+}
+
+.goal-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    padding: 12px 14px;
+
+    background: #f9fafb;
+    border-radius: 10px;
+}
+
+.meta-label {
+    color: #9ca3af;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.goal-meta-item strong {
+    color: #374151;
+    font-size: 14px;
+}
+
+
+/* ================================
+   Secondary Button
+================================ */
+
+.secondary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 8px 13px;
+
+    background: #ffffff;
+    color: #374151;
+
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    white-space: nowrap;
+}
+
+.secondary-button:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+
+/* ================================
+   Goal Activities
+================================ */
+
+.goal-activities {
+    padding-top: 24px;
+    border-top: 1px solid #f0f1f3;
+}
+
+.activities-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    margin-bottom: 14px;
+}
+
+.activities-heading h3 {
+    margin: 0 0 3px;
+    font-size: 16px;
+}
+
+.activities-heading p {
+    margin: 0;
+
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+.add-activity-link {
+    color: #374151;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    white-space: nowrap;
+}
+
+.add-activity-link:hover {
+    color: #111827;
+}
+
+
+/* ================================
+   Activity Rows
+================================ */
+
+.activity-list {
+    border: 1px solid #e5e7eb;
+    border-radius: 11px;
+
+    overflow: hidden;
+}
+
+.goal-activity-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    padding: 14px 16px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #f0f1f3;
+}
+
+.goal-activity-row:last-child {
+    border-bottom: 0;
+}
+
+.goal-activity-info {
+    min-width: 0;
+}
+
+.goal-activity-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 4px;
+}
+
+.goal-activity-title {
+    color: #111827;
+    font-size: 14px;
+}
+
+.activity-details {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.frequency-badge {
+    padding: 2px 7px;
+
+    background: #f3f4f6;
+    border-radius: 999px;
+
+    color: #4b5563;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+/* ================================
+   Archived Activity
+================================ */
+
+.archived-activity {
+    background: #fafafa;
+}
+
+.archived-activity .goal-activity-info {
+    opacity: 0.6;
+}
+
+.archived-badge {
+    padding: 2px 7px;
+
+    background: #f3f4f6;
+    color: #6b7280;
+
+    border-radius: 999px;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+
+/* ================================
+   Activity Actions
+================================ */
+
+.activity-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    flex-shrink: 0;
+}
+
+.activity-actions form {
+    margin: 0;
+}
+
+.text-button {
+    padding: 0;
+
+    background: none;
+    color: #4b5563;
+
+    border: 0;
+
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.text-button:hover {
+    color: #111827;
+}
+
+.danger-text {
+    color: #b91c1c;
+}
+
+.danger-text:hover {
+    color: #7f1d1d;
+}
+
+.restore-text {
+    color: #15803d;
+}
+
+.restore-text:hover {
+    color: #166534;
+}
+
+
+/* ================================
+   Activities Empty
+================================ */
+
+.activities-empty {
+    padding: 20px;
+
+    background: #f9fafb;
+
+    border: 1px dashed #d1d5db;
+    border-radius: 10px;
+
+    color: #9ca3af;
+
+    font-size: 13px;
+    text-align: center;
+}
+
+
+/* ================================
+   Goals Mobile
+================================ */
+
+@media (max-width: 700px) {
+
+    .goals-page-header {
+        align-items: flex-start;
+    }
+
+    .goal-meta {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .goals-page-header {
+        flex-direction: column;
+    }
+
+    .goals-page-header .primary-button {
+        width: 100%;
+    }
+
+    .goal-card {
+        padding: 20px;
+    }
+
+    .goal-card-header {
+        flex-direction: column;
+    }
+
+    .secondary-button {
+        width: 100%;
+    }
+
+    .goal-title-row {
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+
+    .goal-meta {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .activities-heading {
+        align-items: flex-end;
+    }
+
+    .goal-activity-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .activity-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
 }
