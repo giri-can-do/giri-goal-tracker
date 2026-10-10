@@ -1169,3 +1169,137 @@ h3 {
         justify-content: flex-end;
     }
 }
+
+/* ================================
+   Goal Tracker - Forms
+================================ */
+
+.form-page {
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.form-page-header {
+    margin-bottom: 28px;
+}
+
+.form-page-header h1 {
+    margin-bottom: 8px;
+}
+
+.form-card {
+    padding: 32px;
+
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+}
+
+/* Form Groups */
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    min-width: 0;
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    color: #374151;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.required {
+    color: #dc2626;
+}
+
+/* Inputs */
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    min-width: 0;
+
+    padding: 12px 14px;
+
+    background: #ffffff;
+    color: #111827;
+
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+
+    font: inherit;
+    font-size: 14px;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #9ca3af;
+}
+
+/* Two-column Rows */
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+/* Actions */
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+
+    padding-top: 22px;
+    margin-top: 4px;
+
+    border-top: 1px solid #f0f1f3;
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+    .form-card {
+        padding: 22px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .form-actions .primary-button,
+    .form-actions .secondary-button {
+        width: 100%;
+        min-height: 44px;
+    }
+}

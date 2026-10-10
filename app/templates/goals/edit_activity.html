@@ -4,105 +4,176 @@
 
 {% block content %}
 
-<h1>Edit Activity</h1>
+<section class="form-page">
 
-<p>
-    Goal: <strong>{{ activity.goal.title }}</strong>
-</p>
+    <div class="form-page-header">
+        <p class="page-eyebrow">GOALS / EDIT ACTIVITY</p>
 
-<form method="POST">
+        <h1>Edit Activity</h1>
 
-    <label>Activity</label>
-    <input
-        type="text"
-        name="title"
-        value="{{ activity.title }}"
-        required
-    >
+        <p class="page-description">
+            Update the activity for
+            <strong>{{ activity.goal.title }}</strong>.
+        </p>
+    </div>
 
-    <br><br>
+    <form method="POST" class="form-card">
 
-    <label for="start_date">Start Date</label>
-    <input
-        type="date"
-        id="start_date"
-        name="start_date"
-        value="{{ activity.start_date.isoformat() }}"
-        min="{{ activity.goal.start_date.isoformat() }}"
-        required
-    >
-    <br><br>
+        <div class="form-group">
+            <label for="title">
+                Activity Name <span class="required">*</span>
+            </label>
 
-    <label>How do you track it?</label>
-    <select name="measurement_type" required>
+            <input
+                id="title"
+                type="text"
+                name="title"
+                value="{{ activity.title }}"
+                required
+            >
+        </div>
 
-        <option value="boolean"
-            {% if activity.measurement_type == "boolean" %}selected{% endif %}>
-            Complete / Not Complete
-        </option>
+        <div class="form-row">
 
-        <option value="numeric"
-            {% if activity.measurement_type == "numeric" %}selected{% endif %}>
-            Number
-        </option>
+            <div class="form-group">
+                <label for="start_date">
+                    Start Date <span class="required">*</span>
+                </label>
 
-        <option value="duration"
-            {% if activity.measurement_type == "duration" %}selected{% endif %}>
-            Duration
-        </option>
+                <input
+                    id="start_date"
+                    type="date"
+                    name="start_date"
+                    value="{{ activity.start_date.isoformat() }}"
+                    min="{{ activity.goal.start_date.isoformat() }}"
+                    required
+                >
+            </div>
 
-    </select>
+            <div class="form-group">
+                <label for="frequency">
+                    Frequency <span class="required">*</span>
+                </label>
 
-    <br><br>
+                <select id="frequency" name="frequency" required>
 
-    <label>Target</label>
-    <input
-        type="number"
-        name="target_value"
-        min="0"
-        step="any"
-        value="{{ activity.target_value if activity.target_value is not none else '' }}"
-    >
+                    <option value="daily"
+                        {% if activity.frequency == "daily" %}
+                            selected
+                        {% endif %}
+                    >
+                        Every Day
+                    </option>
 
-    <label>Unit</label>
-    <input
-        type="text"
-        name="unit"
-        value="{{ activity.unit or '' }}"
-    >
+                    <option value="weekdays"
+                        {% if activity.frequency == "weekdays" %}
+                            selected
+                        {% endif %}
+                    >
+                        Weekdays
+                    </option>
 
-    <br><br>
+                    <option value="weekends"
+                        {% if activity.frequency == "weekends" %}
+                            selected
+                        {% endif %}
+                    >
+                        Weekends
+                    </option>
 
-    <label>Frequency</label>
-   <select name="frequency" required>
-        <option value="daily"
-            {% if activity.frequency == "daily" %}selected{% endif %}>
-            Every Day
-        </option>
+                </select>
+            </div>
 
-        <option value="weekdays"
-            {% if activity.frequency == "weekdays" %}selected{% endif %}>
-            Weekdays
-        </option>
+        </div>
 
-        <option value="weekends"
-            {% if activity.frequency == "weekends" %}selected{% endif %}>
-            Weekends
-        </option>
-    </select>
+        <div class="form-group">
+            <label for="measurement_type">
+                How do you track it?
+                <span class="required">*</span>
+            </label>
 
-    <br><br>
+            <select
+                id="measurement_type"
+                name="measurement_type"
+                required
+            >
 
-    <button type="submit">
-        Save Changes
-    </button>
+                <option value="boolean"
+                    {% if activity.measurement_type == "boolean" %}
+                        selected
+                    {% endif %}
+                >
+                    Complete / Not Complete
+                </option>
 
-</form>
+                <option value="numeric"
+                    {% if activity.measurement_type == "numeric" %}
+                        selected
+                    {% endif %}
+                >
+                    Number
+                </option>
 
-<p>
-    <a href="{{ url_for('goals.index') }}">
-        Cancel
-    </a>
-</p>
+                <option value="duration"
+                    {% if activity.measurement_type == "duration" %}
+                        selected
+                    {% endif %}
+                >
+                    Duration
+                </option>
+
+            </select>
+        </div>
+
+        <div class="form-row">
+
+            <div class="form-group">
+                <label for="target_value">
+                    Target
+                </label>
+
+                <input
+                    id="target_value"
+                    type="number"
+                    name="target_value"
+                    min="0"
+                    step="any"
+                    value="{{ activity.target_value if activity.target_value is not none else '' }}"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="unit">
+                    Unit
+                </label>
+
+                <input
+                    id="unit"
+                    type="text"
+                    name="unit"
+                    value="{{ activity.unit or '' }}"
+                >
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+
+            <a
+                href="{{ url_for('goals.index') }}"
+                class="secondary-button"
+            >
+                Cancel
+            </a>
+
+            <button type="submit" class="primary-button">
+                Save Changes
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
 
 {% endblock %}

@@ -47,7 +47,7 @@ def create():
                 "danger"
             )
             return render_template(
-                "goals/create.html",
+                "goals/create_goal.html",
                 today=date.today()
             )
 
@@ -69,7 +69,7 @@ def create():
         except ValueError:
             flash("Please check the target value and dates.", "danger")
             return render_template(
-                "goals/create.html",
+                "goals/create_goal.html",
                 today=date.today()
             )
 
@@ -79,7 +79,7 @@ def create():
                 "danger"
             )
             return render_template(
-                "goals/create.html",
+                "goals/create_goal.html",
                 today=date.today()
             )
 
@@ -104,7 +104,7 @@ def create():
         return redirect(url_for("goals.index"))
 
     return render_template(
-        "goals/create.html",
+        "goals/create_goal.html",
         today=date.today()
     )
 
@@ -227,7 +227,7 @@ def edit(goal_id):
                 "Title, goal type and start date are required.",
                 "danger"
             )
-            return render_template("goals/edit.html", goal=goal)
+            return render_template("goals/edit_goal.html", goal=goal)
 
         try:
             target_value = (
@@ -249,14 +249,14 @@ def edit(goal_id):
                 "Please check the target value and dates.",
                 "danger"
             )
-            return render_template("goals/edit.html", goal=goal)
+            return render_template("goals/edit_goal.html", goal=goal)
 
         if deadline and deadline < start_date:
             flash(
                 "Deadline cannot be earlier than the start date.",
                 "danger"
             )
-            return render_template("goals/edit.html", goal=goal)
+            return render_template("goals/edit_goal.html", goal=goal)
 
         goal.title = title
         goal.description = description or None
@@ -273,7 +273,7 @@ def edit(goal_id):
 
         return redirect(url_for("goals.index"))
 
-    return render_template("goals/edit.html", goal=goal)
+    return render_template("goals/edit_goal.html", goal=goal)
 
 @goals_bp.route(
     "/activities/<int:activity_id>/edit",
