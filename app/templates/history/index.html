@@ -4,135 +4,217 @@
 
 {% block content %}
 
-<h1>History</h1>
+<section class="history-page">
 
-<nav>
-    <a href="{{ url_for('history.index', date=previous_date.isoformat()) }}">
-        ← Previous Day
-    </a>
+    <div class="history-page-header">
+        <div>
+            <p class="page-eyebrow">YOUR PROGRESS</p>
+            <h1>Activity History</h1>
+            <p class="page-description">
+                Review your daily progress and update past entries.
+            </p>
+        </div>
+    </div>
 
-    <strong>
-        {{ selected_date.strftime("%A, %B %d, %Y") }}
-    </strong>
+    <div class="history-date-navigation">
 
-    {% if next_date %}
-        <a href="{{ url_for('history.index', date=next_date.isoformat()) }}">
-            Next Day →
+        <a
+            href="{{ url_for('history.index', date=previous_date.isoformat()) }}"
+            class="history-nav-button"
+        >
+            ← Previous
         </a>
-    {% endif %}
-</nav>
 
-<hr>
+        <div class="history-selected-date">
+            <span class="history-date-label">SELECTED DATE</span>
+            <strong>
+                {{ selected_date.strftime("%A, %B %d, %Y") }}
+            </strong>
+        </div>
 
-{% if activities %}
+        {% if next_date %}
+            <a
+                href="{{ url_for('history.index', date=next_date.isoformat()) }}"
+                class="history-nav-button"
+            >
+                Next →
+            </a>
+        {% else %}
+            <span class="history-nav-button disabled">
+                Next →
+            </span>
+        {% endif %}
 
-    {% for activity in activities %}
+    </div>
 
-        {% set entry = entries.get(activity.id) %}
+    {% if activities %}
 
-        <section>
+        <div class="history-activity-grid">
 
-            <h2>{{ activity.title }}</h2>
+            {% for activity in activities %}
+
+                {% set entry = entries.get(activity.id) %}
+
+                <article class="history-activity-card">
+
+                    <div class="history-card-header">
+
+                        <div>
+                            <h2>{{ activity.title }}</h2>
+
+                            <p class="history-goal-name">
+                                {{ activity.goal.title }}
+                            </p>
+                        </div>
+
+                        {% if entry and activity.is_completed(entry) %}
+                            <span class="history-status completed">
+                                ✓ Completed
+                            </span>
+                        {% else %}
+                            <span class="history-status pending">
+                                Not Completed
+                            </span>
+                        {% endif %}
+
+                    </div>
+
+                    {% if activity.target_value %}
+
+                        <p class="history-target">
+                            Target:
+                            <strong>
+                                {{ activity.target_value | number }}
+                                {{ activity.unit or "" }}
+                            </strong>
+                        </p>
+
+                    {% endif %}
+
+                    {% if entry %}
+
+                        {% set percentage = activity.completion_percentage(entry) %}
+
+                        <div class="history-progress-info">
+
+                            <span>
+                                Recorded:
+                                <strong>
+                                    {{ entry.value | number }}
+                                    {{ activity.unit or "" }}
+                                </strong>
+                            </span>
+
+                            <strong>
+                                {{ percentage | number }}%
+                            </strong>
+
+                        </div>
+
+                        <div class="history-progress-track">
+
+                            <div
+                                class="history-progress-fill
+                                    {% if activity.is_completed(entry) %}
+                                        completed
+                                    {% endif %}"
+                                style="width: {{ [percentage, 100] | min }}%;"
+                            ></div>
+
+                        </div>
+
+                    {% else %}
+
+                        <p class="history-no-entry">
+                            No entry recorded for this date.
+                        </p>
+
+                    {% endif %}
+
+                    <form
+                        method="POST"
+                        class="history-entry-form"
+                        action="{{ url_for(
+                            'history.save_entry',
+                            activity_id=activity.id,
+                            entry_date=selected_date.isoformat()
+                        ) }}"
+                    >
+
+                        {% if activity.measurement_type == "boolean" %}
+
+                            <input
+                                type="hidden"
+                                name="value"
+                                value="1"
+                            >
+
+                            <button
+                                type="submit"
+                                class="history-save-button"
+                            >
+                                {% if entry and entry.value >= 1 %}
+                                    ✓ Completed
+                                {% else %}
+                                    Mark Complete
+                                {% endif %}
+                            </button>
+
+                        {% else %}
+
+                            <div class="history-entry-input">
+
+                                <input
+                                    type="number"
+                                    name="value"
+                                    min="0"
+                                    step="any"
+                                    value="{{ entry.value | number | replace(',', '') if entry else '' }}"
+                                    placeholder="{{ activity.target_value or 0 }}"
+                                    required
+                                >
+
+                                {% if activity.unit %}
+                                    <span>{{ activity.unit }}</span>
+                                {% endif %}
+
+                            </div>
+
+                            <button
+                                type="submit"
+                                class="history-save-button"
+                            >
+                                {% if entry %}
+                                    Update
+                                {% else %}
+                                    Add Entry
+                                {% endif %}
+                            </button>
+
+                        {% endif %}
+
+                    </form>
+
+                </article>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="history-empty-state">
+            <div class="history-empty-icon">📅</div>
+
+            <h2>No Activities Found</h2>
 
             <p>
-                Goal: {{ activity.goal.title }}
+                No activities existed on this date.
             </p>
+        </div>
 
-            {% if activity.target_value %}
-                <p>
-                    Target:
-                    {{ activity.target_value }}
-                    {{ activity.unit or "" }}
-                </p>
-            {% endif %}
+    {% endif %}
 
-            {% if entry %}
-
-                <p>
-                    Recorded:
-                    <strong>
-                        {{ entry.value }}
-                        {{ activity.unit or "" }}
-                    </strong>
-
-                    {% set percentage = activity.completion_percentage(entry) %}
-
-                    <p>
-                        Completion:
-                        <strong>{{ percentage }}%</strong>
-
-                        {% if activity.is_completed(entry) %}
-                            ✓
-                        {% endif %}
-                    </p>
-                </p>
-
-
-            {% else %}
-
-                <p>No entry recorded.</p>
-
-            {% endif %}
-
-        </section>
-
-        <form
-            method="POST"
-            action="{{ url_for(
-                'history.save_entry',
-                activity_id=activity.id,
-                entry_date=selected_date.isoformat()
-            ) }}"
-        >
-
-            {% if activity.measurement_type == "boolean" %}
-
-                <input type="hidden" name="value" value="1">
-
-                <button type="submit">
-                    {% if entry and entry.value >= 1 %}
-                        ✓ Completed
-                    {% else %}
-                        Mark Complete
-                    {% endif %}
-                </button>
-
-            {% else %}
-
-                <input
-                    type="number"
-                    name="value"
-                    min="0"
-                    step="any"
-                    value="{{ entry.value if entry else '' }}"
-                    placeholder="{{ activity.target_value or 0 }}"
-                    required
-                >
-
-                <span>{{ activity.unit or "" }}</span>
-
-                <button type="submit">
-                    {% if entry %}
-                        Update
-                    {% else %}
-                        Add Entry
-                    {% endif %}
-                </button>
-
-            {% endif %}
-
-        </form>
-
-        <hr>
-
-    {% endfor %}
-
-{% else %}
-
-    <p>
-        No activities existed on this date.
-    </p>
-
-{% endif %}
+</section>
 
 {% endblock %}

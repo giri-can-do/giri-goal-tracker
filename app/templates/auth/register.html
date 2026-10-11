@@ -4,26 +4,88 @@
 
 {% block content %}
 
-<h1>Create Account</h1>
+<section class="auth-page">
 
-<form method="POST">
+    <div class="auth-card">
 
-    <label>Username</label>
-    <input type="text" name="username" required>
+        <div class="auth-header">
+            <div class="auth-logo">🎯</div>
 
-    <label>Email</label>
-    <input type="email" name="email" required>
+            <h1>Create Your Account</h1>
 
-    <label>Password</label>
-    <input type="password" name="password" required>
+            <p>
+                Start building better habits and achieving your goals.
+            </p>
+        </div>
 
-    <button type="submit">Register</button>
+        <form method="POST" class="auth-form">
 
-</form>
+            <div class="form-group">
+                <label for="username">
+                    Username
+                </label>
 
-<p>
-    Already have an account?
-    <a href="{{ url_for('auth.login') }}">Login</a>
-</p>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Choose a username"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="email">
+                    Email Address
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    autocomplete="email"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Create a password"
+                    autocomplete="new-password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="auth-submit-button">
+                Create Account
+            </button>
+
+        </form>
+
+        <div class="auth-footer">
+            <p>
+                Already have an account?
+                <a href="{{ url_for('auth.login') }}">
+                    Sign In
+                </a>
+            </p>
+        </div>
+
+    </div>
+
+    <p class="auth-bottom-text">
+        Your journey starts with one small step.
+    </p>
+
+</section>
 
 {% endblock %}

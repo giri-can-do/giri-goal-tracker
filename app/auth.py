@@ -22,6 +22,10 @@ def register():
             flash("All fields are required.", "danger")
             return render_template("auth/register.html")
 
+        if len(password) < 12:
+            flash("Password must contain at least 12 characters.", "danger")
+            return render_template("auth/register.html")
+
         existing_user = User.query.filter(
             (User.username == username) | (User.email == email)
         ).first()
