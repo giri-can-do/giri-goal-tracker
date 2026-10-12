@@ -214,6 +214,7 @@
                     method="POST"
                     action="{{ url_for('today.check_in', activity_id=activity.id) }}"
                 >
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     {% if activity.measurement_type == "boolean" %}
 

@@ -228,6 +228,7 @@
                                                     activity_id=activity.id
                                                 ) }}"
                                             >
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                 <button
                                                     class="text-button danger-text"
                                                     type="submit"
@@ -245,6 +246,7 @@
                                                     activity_id=activity.id
                                                 ) }}"
                                             >
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                 <button
                                                     class="text-button restore-text"
                                                     type="submit"

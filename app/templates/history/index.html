@@ -140,6 +140,7 @@
                             entry_date=selected_date.isoformat()
                         ) }}"
                     >
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                         {% if activity.measurement_type == "boolean" %}
 
