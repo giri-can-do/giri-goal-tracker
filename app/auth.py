@@ -3,12 +3,14 @@ from flask_login import login_user, logout_user, login_required, current_user
 
 from app import db
 from app.models import User
+from app import limiter
 
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
+@limiter.limit("3 per hour", methods=["POST"])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for("today.index"))
@@ -51,6 +53,7 @@ def register():
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
+@limiter.limit("5 per minute", methods=["POST"])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for("today.index"))
