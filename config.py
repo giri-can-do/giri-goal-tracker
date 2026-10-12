@@ -9,4 +9,9 @@ class Config:
         "sqlite:///goal_tracker.db"
     )
 
+    RATELIMIT_STORAGE_URI = os.environ.get(
+        "RATELIMIT_STORAGE_URI",
+        "memory://"
+    )
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
