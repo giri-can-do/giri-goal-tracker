@@ -14,4 +14,12 @@ class Config:
         "memory://"
     )
 
+    # Production session security
+    SESSION_COOKIE_SECURE = os.environ.get(
+        "SESSION_COOKIE_SECURE", "false"
+    ).lower() == "true"
+
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
