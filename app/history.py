@@ -1,4 +1,6 @@
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
+from math import isfinite
+from app.calendar import tokyo_today
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
@@ -17,7 +19,7 @@ history_bp = Blueprint(
 @history_bp.route("/")
 @login_required
 def index():
-    today = date.today()
+    today = tokyo_today()
 
     date_raw = request.args.get("date")
 
@@ -103,7 +105,7 @@ def index():
 )
 @login_required
 def save_entry(activity_id, entry_date):
-    today = date.today()
+    today = tokyo_today()
 
     try:
         selected_date = datetime.strptime(
@@ -156,12 +158,12 @@ def save_entry(activity_id, entry_date):
     value_raw = request.form.get("value", "").strip()
 
     try:
-        if activity.measurement_type == "boolean":
+        if activity.target_on(selected_date).measurement_type == "boolean":
             value = 1.0
         else:
             value = float(value_raw)
 
-            if value < 0:
+            if not isfinite(value) or value < 0:
                 raise ValueError
 
     except ValueError:

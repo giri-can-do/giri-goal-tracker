@@ -21,9 +21,13 @@ limiter = Limiter(
     default_limits=[]
 )
 
-def create_app():
+def create_app(test_config=None):
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    if test_config is not None:
+        app.config.update(test_config)
+    
     # Trust one reverse proxy only in production
     if os.environ.get("TRUST_PROXY", "false").lower() == "true":
         app.wsgi_app = ProxyFix(
@@ -52,7 +56,9 @@ def create_app():
     app.register_blueprint(auth_bp)
     app.register_blueprint(today_bp)
     app.register_blueprint(goals_bp)
+    from app.dashboard import dashboard_bp
     app.register_blueprint(history_bp)
+    app.register_blueprint(dashboard_bp)
 
     return app
 

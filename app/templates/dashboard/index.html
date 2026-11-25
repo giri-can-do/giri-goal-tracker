@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Goal Tracker{% endblock %}
+{% block content %}
+<div class="dashboard">
+<h1>Dashboard</h1>
+<nav class="dashboard-tabs" aria-label="Dashboard views">
+    {% for tab in ('overview', 'week', 'month', 'year') %}
+    <a href="{{ url_for('dashboard.index', view=tab) }}"{% if tab == view %} aria-current="page"{% endif %}>{{ tab | title }}</a>
+    {% endfor %}
+</nav>
+{% for period, rows in reports.items() %}
+<section class="dashboard-period">
+    <h2 id="dashboard-{{ period }}">This {{ period }}</h2>
+    {% if rows %}
+    <div class="dashboard-table-scroll" role="region" aria-labelledby="dashboard-{{ period }}" tabindex="0">
+    <table class="dashboard-table" aria-labelledby="dashboard-{{ period }}">
+        <thead><tr><th>Activity</th><th>Logged</th><th>Daily targets met</th><th>Closed weeks met</th><th>Open week</th></tr></thead>
+        <tbody>
+        {% for row in rows %}
+        <tr>
+            <th scope="row">{{ row.title }}</th>
+            <td>{{ row.total | number }} {{ row.unit or '' }}</td>
+            <td>{{ row.daily_done ~ ' / ' ~ row.daily_due if row.daily_due else '—' }}</td>
+            <td>{{ row.weekly_done ~ ' / ' ~ row.weekly_due if row.weekly_due else '—' }}</td>
+            <td>{% if row.open_week %}{{ row.open_week[0] | number }} / {{ row.open_week[1] | number }} {{ row.unit or '' }}{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <p>No activities in this period.</p>
+    {% endif %}
+</section>
+{% endfor %}
+</div>
+{% endblock %}

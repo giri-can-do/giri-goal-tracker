@@ -4,6 +4,7 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app import db, login_manager
+from app.calendar import tokyo_today
 
 
 @login_manager.user_loader
@@ -136,19 +137,43 @@ class Activity(db.Model):
         cascade="all, delete-orphan"
     )
 
+    target_versions = db.relationship(
+        "ActivityTargetVersion", cascade="all, delete-orphan",
+        order_by="ActivityTargetVersion.effective_from", lazy="selectin"
+    )
+
+    def target_on(self, day):
+        return next(
+            (version for version in reversed(self.target_versions)
+             if version.effective_from <= day),
+            self.target_versions[0] if self.target_versions else self,
+        )
+
+    
     def completion_percentage(self, entry):
         if entry is None:
             return 0
 
-        if self.measurement_type == "boolean":
-            return 100 if entry.value >= 1 else 0
+        target = self.target_on(entry.entry_date)
 
-        if not self.target_value or self.target_value <= 0:
+        if target.frequency == "weekly":
             return 0
 
-        percentage = (entry.value / self.target_value) * 100
+        if target.measurement_type == "boolean":
+            return 100 if entry.value >= 1 else 0
 
-        return min(round(percentage), 100)
+        if not target.target_value or target.target_value <= 0:
+            return 0
+
+        if entry.value >= target.target_value:
+            return 100
+
+        percentage = round(
+            entry.value / target.target_value * 100
+        )
+
+        return max(0, min(percentage, 99))
+
 
 
     def is_completed(self, entry):
@@ -158,13 +183,14 @@ class Activity(db.Model):
         if check_date < self.start_date:
             return False
 
-        if self.frequency == "daily":
+        frequency = self.target_on(check_date).frequency
+        if frequency in ("daily", "weekly"):
             return True
 
-        if self.frequency == "weekdays":
+        if frequency == "weekdays":
             return check_date.weekday() < 5
 
-        if self.frequency == "weekends":
+        if frequency == "weekends":
             return check_date.weekday() >= 5
 
         return False
@@ -173,7 +199,7 @@ class Activity(db.Model):
         from datetime import date, timedelta
 
         if today is None:
-            today = date.today()
+            today = tokyo_today()
 
         entries = {
             entry.entry_date: entry
@@ -199,6 +225,8 @@ class Activity(db.Model):
         while check_date >= self.start_date:
 
             # Unscheduled days neither count nor break the streak.
+            if self.target_on(check_date).frequency == "weekly":
+                break
             if not self.is_scheduled_for(check_date):
                 check_date -= timedelta(days=1)
                 continue
@@ -217,7 +245,7 @@ class Activity(db.Model):
         from datetime import date, timedelta
 
         if today is None:
-            today = date.today()
+            today = tokyo_today()
 
         entries = {
             entry.entry_date: entry
@@ -260,7 +288,7 @@ class Activity(db.Model):
         while check_date <= end_date:
 
             # Only scheduled days belong in the denominator.
-            if self.is_scheduled_for(check_date):
+            if self.is_scheduled_for(check_date) and self.target_on(check_date).frequency != "weekly":
                 eligible += 1
 
                 entry = entries.get(check_date)
@@ -281,6 +309,21 @@ class Activity(db.Model):
             "eligible": eligible,
             "percentage": percentage
         }
+
+
+class ActivityTargetVersion(db.Model):
+    __tablename__ = "activity_target_versions"
+    __table_args__ = (
+        db.UniqueConstraint("activity_id", "effective_from", name="uq_activity_target_date"),
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    activity_id = db.Column(db.Integer, db.ForeignKey("activities.id"), nullable=False)
+    effective_from = db.Column(db.Date, nullable=False)
+    frequency = db.Column(db.String(30), nullable=False)
+    measurement_type = db.Column(db.String(30), nullable=False)
+    target_value = db.Column(db.Float)
+    unit = db.Column(db.String(30))
 
 
 class DailyEntry(db.Model):

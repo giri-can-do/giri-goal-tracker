@@ -3,6 +3,11 @@ from datetime import date, datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 
+from app.calendar import monday, tokyo_today
+from app.models import ActivityTargetVersion
+from datetime import timedelta
+from math import isfinite
+
 from app import db
 from app.models import Goal, Activity
 
@@ -48,7 +53,7 @@ def create():
             )
             return render_template(
                 "goals/create_goal.html",
-                today=date.today()
+                today=tokyo_today()
             )
 
         try:
@@ -70,7 +75,7 @@ def create():
             flash("Please check the target value and dates.", "danger")
             return render_template(
                 "goals/create_goal.html",
-                today=date.today()
+                today=tokyo_today()
             )
 
         if deadline and deadline < start_date:
@@ -80,7 +85,7 @@ def create():
             )
             return render_template(
                 "goals/create_goal.html",
-                today=date.today()
+                today=tokyo_today()
             )
 
         goal = Goal(
@@ -105,7 +110,7 @@ def create():
 
     return render_template(
         "goals/create_goal.html",
-        today=date.today()
+        today=tokyo_today()
     )
 
 @goals_bp.route("/<int:goal_id>/activities/new", methods=["GET", "POST"])
@@ -126,10 +131,11 @@ def create_activity(goal_id):
         valid_frequencies = {
             "daily",
             "weekdays",
-            "weekends"
+            "weekends",
+            "weekly"
         }
 
-        if frequency not in valid_frequencies:
+        if frequency not in valid_frequencies or (frequency == "weekly" and measurement_type not in ("numeric", "duration")):
             flash("Please select a valid frequency.", "danger")
             return redirect(request.url)
 
@@ -169,7 +175,7 @@ def create_activity(goal_id):
             )
 
         if measurement_type in ("numeric", "duration"):
-            if target_value is None or target_value <= 0:
+            if target_value is None or not isfinite(target_value) or target_value <= 0:
                 flash(
                     "Numeric and duration activities require a target greater than 0.",
                     "danger"
@@ -190,6 +196,11 @@ def create_activity(goal_id):
             start_date=start_date,
         )
 
+        activity.target_versions.append(ActivityTargetVersion(
+            effective_from=monday(start_date) if frequency == "weekly" else start_date,
+            frequency=frequency, measurement_type=measurement_type,
+            target_value=target_value, unit=unit or None,
+        ))
         db.session.add(activity)
         db.session.commit()
 
@@ -313,10 +324,11 @@ def edit_activity(activity_id):
         valid_frequencies = {
             "daily",
             "weekdays",
-            "weekends"
+            "weekends",
+            "weekly"
         }
 
-        if frequency not in valid_frequencies:
+        if frequency not in valid_frequencies or (frequency == "weekly" and measurement_type not in ("numeric", "duration")):
             flash("Please select a valid frequency.", "danger")
             return redirect(request.url)
 
@@ -344,7 +356,7 @@ def edit_activity(activity_id):
             )
 
         if measurement_type in ("numeric", "duration"):
-            if target_value is None or target_value <= 0:
+            if target_value is None or not isfinite(target_value) or target_value <= 0:
                 flash(
                     "Numeric and duration activities require "
                     "a target greater than 0.",
@@ -354,6 +366,39 @@ def edit_activity(activity_id):
                     "goals/edit_activity.html",
                     activity=activity
                 )
+
+        settings = (frequency, measurement_type, target_value, unit or None)
+        previous = (activity.frequency, activity.measurement_type, activity.target_value, activity.unit)
+        if activity.daily_entries and (
+            settings[1] != previous[1] or settings[3] != previous[3]
+            or start_date != activity.start_date
+        ):
+            flash("Start date, measurement type and unit are fixed once progress is logged.", "danger")
+            return redirect(request.url)
+        if settings != previous:
+            today = tokyo_today()
+            active = activity.target_on(today)
+            effective = (
+                monday(today) + timedelta(days=7)
+                if "weekly" in (active.frequency, frequency)
+                else today + timedelta(days=1)
+            )
+            for version in list(activity.target_versions):
+                if version.effective_from > today:
+                    if version.effective_from == effective and settings != (
+                        active.frequency, active.measurement_type, active.target_value, active.unit
+                    ):
+                        version.frequency, version.measurement_type, version.target_value, version.unit = settings
+                        break
+                    activity.target_versions.remove(version)
+            else:
+                version = None
+            if version is None and settings != (active.frequency, active.measurement_type, active.target_value, active.unit):
+                activity.target_versions.append(ActivityTargetVersion(
+                    effective_from=effective, frequency=frequency,
+                    measurement_type=measurement_type, target_value=target_value,
+                    unit=unit or None,
+                ))
 
         activity.title = title
         activity.start_date = start_date

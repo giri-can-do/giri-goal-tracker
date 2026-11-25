@@ -126,15 +126,15 @@
                                 {{ (entry.value if entry else 0) | number }}
                             </span>
 
-                            {% if activity.target_value %}
+                            {% if activity.target_on(today).target_value %}
                                 <span class="target-value">
-                                    / {{ activity.target_value | number }}
+                                    / {{ activity.target_on(today).target_value | number }}
                                 </span>
                             {% endif %}
 
-                            {% if activity.unit %}
+                            {% if activity.target_on(today).unit %}
                                 <span class="progress-unit">
-                                    {{ activity.unit }}
+                                    {{ activity.target_on(today).unit }}
                                 </span>
                             {% endif %}
                         </div>
@@ -216,7 +216,7 @@
                 >
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                    {% if activity.measurement_type == "boolean" %}
+                    {% if activity.target_on(today).measurement_type == "boolean" %}
 
                         <input
                             type="hidden"
@@ -246,13 +246,13 @@
                                 min="0"
                                 step="any"
                                 value="{{ entry.value if entry else '' }}"
-                                placeholder="{{ activity.target_value or 0 }}"
+                                placeholder="{{ activity.target_on(today).target_value or 0 }}"
                                 required
                             >
 
-                            {% if activity.unit %}
+                            {% if activity.target_on(today).unit %}
                                 <span class="input-unit">
-                                    {{ activity.unit }}
+                                    {{ activity.target_on(today).unit }}
                                 </span>
                             {% endif %}
 
@@ -276,7 +276,7 @@
     </section>
 
 
-{% else %}
+{% elif not weekly %}
 
     <section class="empty-state">
 
@@ -299,6 +299,52 @@
 
     </section>
 
+{% endif %}
+
+{% if weekly %}
+<section class="weekly-targets" aria-labelledby="weekly-heading">
+    <h2 id="weekly-heading">Weekly targets · Monday–Sunday</h2>
+    <div class="activity-grid">
+    {% for activity in weekly %}
+        {% set target = activity.target_on(today) %}
+        {% set amount = weekly_totals.get(activity.id, 0) %}
+        {% set percentage = [((amount / target.target_value * 100) | round | int) if target.target_value else 0, 100] | min %}
+        <article class="activity-card {% if percentage >= 100 %}activity-completed{% endif %}">
+            <div class="activity-card-header">
+                <div>
+                    <div class="activity-title-row">
+                        <h3 class="activity-title">{{ activity.title }}</h3>
+                        {% if percentage >= 100 %}<span class="completed-badge">✓ Completed</span>{% endif %}
+                    </div>
+                    <p class="activity-goal">{{ activity.goal.title }}</p>
+                </div>
+            </div>
+            <div class="activity-progress">
+                <div class="progress-values">
+                    <div>
+                        <span class="current-value">{{ amount | number }}</span>
+                        <span class="target-value">/ {{ target.target_value | number }}</span>
+                        <span class="progress-unit">{{ target.unit or '' }}</span>
+                    </div>
+                    <strong class="activity-percentage">{{ percentage }}%</strong>
+                </div>
+                <div class="progress-track" role="progressbar" aria-label="{{ activity.title }} weekly progress" aria-valuenow="{{ percentage }}" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-fill {% if percentage < 100 %}progress-incomplete{% endif %}" style="width: {{ percentage }}%;"></div>
+                </div>
+            </div>
+            <label class="weekly-entry-label" for="weekly-{{ activity.id }}">Today's amount</label>
+            <form class="activity-checkin" method="post" action="{{ url_for('today.check_in', activity_id=activity.id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="value-input-group">
+                    <input class="progress-input" id="weekly-{{ activity.id }}" name="value" type="number" min="0" step="any" required value="{{ entries[activity.id].value if activity.id in entries else '' }}">
+                    <span class="input-unit">{{ target.unit or '' }}</span>
+                </div>
+                <button class="primary-button" type="submit">Update</button>
+            </form>
+        </article>
+    {% endfor %}
+    </div>
+</section>
 {% endif %}
 
 {% endblock %}

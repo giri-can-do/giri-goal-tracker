@@ -79,13 +79,13 @@
 
                     </div>
 
-                    {% if activity.target_value %}
+                    {% if activity.target_on(selected_date).target_value %}
 
                         <p class="history-target">
                             Target:
                             <strong>
-                                {{ activity.target_value | number }}
-                                {{ activity.unit or "" }}
+                                {{ activity.target_on(selected_date).target_value | number }}
+                                {{ activity.target_on(selected_date).unit or "" }}
                             </strong>
                         </p>
 
@@ -101,7 +101,7 @@
                                 Recorded:
                                 <strong>
                                     {{ entry.value | number }}
-                                    {{ activity.unit or "" }}
+                                    {{ activity.target_on(selected_date).unit or "" }}
                                 </strong>
                             </span>
 
@@ -142,7 +142,7 @@
                     >
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                        {% if activity.measurement_type == "boolean" %}
+                        {% if activity.target_on(selected_date).measurement_type == "boolean" %}
 
                             <input
                                 type="hidden"
@@ -171,12 +171,12 @@
                                     min="0"
                                     step="any"
                                     value="{{ entry.value | number | replace(',', '') if entry else '' }}"
-                                    placeholder="{{ activity.target_value or 0 }}"
+                                    placeholder="{{ activity.target_on(selected_date).target_value or 0 }}"
                                     required
                                 >
 
-                                {% if activity.unit %}
-                                    <span>{{ activity.unit }}</span>
+                                {% if activity.target_on(selected_date).unit %}
+                                    <span>{{ activity.target_on(selected_date).unit }}</span>
                                 {% endif %}
 
                             </div>

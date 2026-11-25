@@ -1,4 +1,5 @@
-from datetime import date
+from math import isfinite
+from app.calendar import monday, tokyo_today
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
@@ -13,7 +14,7 @@ today_bp = Blueprint("today", __name__)
 @today_bp.route("/")
 @login_required
 def index():
-    today = date.today()
+    today = tokyo_today()
 
     activities = (
         Activity.query
@@ -50,6 +51,15 @@ def index():
         .all()
     } if activities else {}
 
+    weekly = [activity for activity in activities if activity.target_on(today).frequency == "weekly"]
+    activities = [activity for activity in activities if activity not in weekly]
+    week_start = monday(today)
+    weekly_totals = dict(
+        db.session.query(DailyEntry.activity_id, db.func.sum(DailyEntry.value))
+        .filter(DailyEntry.activity_id.in_([activity.id for activity in weekly]),
+                DailyEntry.entry_date.between(week_start, today))
+        .group_by(DailyEntry.activity_id).all()
+    )
     total_activities = len(activities)
 
     completed_activities = sum(
@@ -73,6 +83,8 @@ def index():
         today=today,
         activities=activities,
         entries=entries,
+        weekly=weekly,
+        weekly_totals=weekly_totals,
         total_activities=total_activities,
         completed_activities=completed_activities,
         day_completion_percentage=day_completion_percentage
@@ -82,7 +94,7 @@ def index():
 @today_bp.route("/activities/<int:activity_id>/check-in", methods=["POST"])
 @login_required
 def check_in(activity_id):
-    today = date.today()
+    today = tokyo_today()
 
     activity = (
         Activity.query
@@ -96,15 +108,18 @@ def check_in(activity_id):
         .first_or_404()
     )
 
+    if today < activity.goal.start_date or not activity.is_scheduled_for(today):
+        return redirect(url_for("today.index"))
+
     value_raw = request.form.get("value", "").strip()
 
     try:
-        if activity.measurement_type == "boolean":
+        if activity.target_on(today).measurement_type == "boolean":
             value = 1.0
         else:
             value = float(value_raw)
 
-            if value < 0:
+            if not isfinite(value) or value < 0:
                 raise ValueError
 
     except ValueError:
